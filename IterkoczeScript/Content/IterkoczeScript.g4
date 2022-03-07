@@ -1,0 +1,61 @@
+grammar IterkoczeScript;
+
+program: line* EOF;
+line: statement | ifBlock | whileBlock | functionDefinition;
+
+statement: (assingment | functionCall | returnStatement) ';';
+
+returnStatement: 'return' expression;
+
+ifBlock: 'if' expression block ('else' elseIfBlock)?;
+
+elseIfBlock: block | ifBlock;
+
+whileBlock: WHILE expression block ('else' elseIfBlock);
+
+WHILE: 'while';
+
+functionDefinition: DEFINE IDENTIFIER block;
+
+functionCall: IDENTIFIER '(' (expression (',' expression)*)? ')';
+
+DEFINE: 'def' | 'define';
+
+assingment: IDENTIFIER '=' expression;
+
+expression
+    : constant                              #constantExp
+    | '$' INTEGER                           #argumentIdentifierExp
+    | returnStatement                       #returnStatementExp
+    | IDENTIFIER                            #identifierExp
+    | functionCall                          #functionCallExp
+    | functionDefinition                    #functionDefinitionExp
+    | '(' expression ')'                    #parenthesizedExp
+    | '!' expression                        #notExp
+    | expression mulOp expression           #mulExp
+    | expression addOp expression           #addExp
+    | expression compareOp expression       #compareExp
+    | expression booleanOp expression       #booleanExp
+    ;
+    
+mulOp: '*' | '/' | '%';
+addOp: '+' | '-';
+compareOp: '==' | '!=' | '>' | '<' | '>=' | '<=';
+booleanOp: BOOLEAN_OPERATOR;
+
+BOOLEAN_OPERATOR: 'and' | 'or' | 'xor';
+    
+constant: INTEGER | FLOAT | STRING | BOOLEAN | NULL;
+
+INTEGER: [0-9]+;
+FLOAT: [0-9]+ '.' [0-9]+;
+STRING: ('"' ~'"'* '"') | ('\'' ~'\''* '\'');
+BOOLEAN: 'true' | 'false';
+NULL: 'null';  
+
+block: '{' line* '}'; 
+
+WS: [ \t\r\n]+ -> skip;
+IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
+
+ 

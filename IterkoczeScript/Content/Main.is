@@ -1,0 +1,7 @@
+def T1
+{
+   arg = 11;
+   Write(arg);
+}
+
+T1();
