@@ -1,0 +1,2 @@
+input = Read("Type something: ");
+Write("You typed: " + input);

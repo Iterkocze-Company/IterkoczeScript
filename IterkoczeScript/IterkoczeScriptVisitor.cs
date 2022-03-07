@@ -9,7 +9,8 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
     private Dictionary<string, object?> VARS { get; } = new();
     private Dictionary<string, object?> STANDARD_FUNCTIONS { get; } = new();
     private List<Function> FUNCTIONS { get; } = new();
-    private Function currentFunction = null;
+    private static Function mainFunction = new("Main", null);
+    private Function currentFunction = mainFunction;
 
     public IterkoczeScriptVisitor()
     {
@@ -26,8 +27,8 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         var varName = context.IDENTIFIER().GetText();
         var value = Visit(context.expression());
         currentFunction.VARS[varName] = value;
-        
-        return null;
+
+        return currentFunction.VARS[varName];
     }
 
     public override object? VisitFunctionCall(IterkoczeScriptParser.FunctionCallContext context)
@@ -42,7 +43,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
                 function.args = args;
                 currentFunction = function;
                 VisitBlock(function.Code);
-                currentFunction = null;
+                currentFunction.VARS = VARS;
                 return function.ReturnValue;
             }
         }

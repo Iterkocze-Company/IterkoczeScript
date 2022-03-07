@@ -1,0 +1,7 @@
+def Function
+{
+    Write($0);
+    return 12;
+}
+
+Write(Function("Hello"));
