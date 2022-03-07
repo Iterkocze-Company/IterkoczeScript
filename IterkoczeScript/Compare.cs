@@ -40,6 +40,9 @@ public static class Compare
             return lInt == rFloat;
         if (left is float lFloat && right is int rInt)
             return lFloat == rInt;
+        
+        if (left is string || right is string)
+            return left == right;
 
         new Error($"Cannot compare values of types {left.GetType()} and {right.GetType()}");
         return false;

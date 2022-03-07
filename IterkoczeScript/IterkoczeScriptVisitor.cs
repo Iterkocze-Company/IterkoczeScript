@@ -7,6 +7,7 @@ namespace IterkoczeScript;
 public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
 {
     private Dictionary<string, object?> VARS { get; } = new();
+    private Dictionary<string, object?> PREDEF_VARS { get; } = new();
     private Dictionary<string, object?> STANDARD_FUNCTIONS { get; } = new();
     private List<Function> FUNCTIONS { get; } = new();
     private static Function mainFunction = new("Main", null);
@@ -14,7 +15,8 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
 
     public IterkoczeScriptVisitor()
     {
-        mainFunction.VARS["PI"] = Math.PI;
+        PREDEF_VARS["PI"] = Math.PI;
+        PREDEF_VARS["Error"] = "Error";
 
         STANDARD_FUNCTIONS["Write"] = new Func<object?[], object?>(StandardFunctions.Write);
         STANDARD_FUNCTIONS["WriteToFile"] = new Func<object?[], object?>(StandardFunctions.WriteToFile);
@@ -64,9 +66,10 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
             if (function.Name == name)
             {
                 function.args = args;
-                currentFunction = function;
+                currentFunction.args = args;
+                //currentFunction = function;
                 VisitBlock(function.Code);
-                currentFunction.VARS = VARS;
+                //currentFunction.VARS = VARS;
                 return function.ReturnValue;
             }
         }
@@ -107,6 +110,9 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
     public override object? VisitIdentifierExp(IterkoczeScriptParser.IdentifierExpContext context)
     {
         var varName = context.IDENTIFIER().GetText();
+
+        if (varName == "Error") return PREDEF_VARS[varName];
+        if (varName == "PI") return PREDEF_VARS[varName];
 
         if (!currentFunction.VARS.ContainsKey(varName))
         {
