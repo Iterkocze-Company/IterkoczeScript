@@ -5,6 +5,8 @@ line: statement | ifBlock | whileBlock | functionDefinition;
 
 statement: (assingment | functionCall | returnStatement) ';';
 
+useStatement: 'use' IDENTIFIER;
+
 returnStatement: 'return' expression;
 
 ifBlock: IF expression block ('else' elseIfBlock)?;

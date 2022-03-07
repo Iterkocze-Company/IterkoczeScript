@@ -4,11 +4,41 @@ public class StandardFunctions
 {
     public static object? Write(object?[] args)
     {
-        if (args.Length != 1)
-            new Error("Function \"Write\" expects 1 argument.");
-        foreach (var arg in args)
+        if (args.Length > 2)
+            new Error("Function \"Write\" expects 1 argument. And 1 optional argument");
+
+        if (args.Length == 2)
         {
-            Console.WriteLine(arg);
+            var oldColour = Console.ForegroundColor;
+            var colour = args[1];
+            switch (colour)
+            {
+                case ConsoleColor.Red:
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    break;
+                case ConsoleColor.Green:
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    break;
+                case ConsoleColor.Blue:
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    break;
+                default:
+                    new Error("The colour wasn't defined!");
+                    break;
+                        
+            }
+            //foreach (var arg in args)
+            //{
+                Console.WriteLine(args[0]);
+            //}
+            Console.ForegroundColor = oldColour;
+        }
+        else
+        {
+            //foreach (var arg in args)
+            //{
+                Console.WriteLine(args[0]);
+            //}
         }
 
         return null;

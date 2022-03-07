@@ -16,7 +16,10 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
     public IterkoczeScriptVisitor()
     {
         PREDEF_VARS["PI"] = Math.PI;
-        PREDEF_VARS["Error"] = "Error";
+        PREDEF_VARS["RED"] = ConsoleColor.Red;
+        PREDEF_VARS["GREEN"] = ConsoleColor.Green;
+        PREDEF_VARS["BLUE"] = ConsoleColor.Blue;
+        PREDEF_VARS["ERROR"] = "Error";
 
         STANDARD_FUNCTIONS["Write"] = new Func<object?[], object?>(StandardFunctions.Write);
         STANDARD_FUNCTIONS["WriteToFile"] = new Func<object?[], object?>(StandardFunctions.WriteToFile);
@@ -67,7 +70,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
             {
                 function.args = args;
                 currentFunction.args = args;
-                //currentFunction = function;
+                currentFunction = function;
                 VisitBlock(function.Code);
                 //currentFunction.VARS = VARS;
                 return function.ReturnValue;
@@ -111,7 +114,10 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
     {
         var varName = context.IDENTIFIER().GetText();
 
-        if (varName == "Error") return PREDEF_VARS[varName];
+        if (varName == "ERROR") return PREDEF_VARS[varName];
+        if (varName == "RED") return PREDEF_VARS[varName];
+        if (varName == "GREEN") return PREDEF_VARS[varName];
+        if (varName == "BLUE") return PREDEF_VARS[varName];
         if (varName == "PI") return PREDEF_VARS[varName];
 
         if (!currentFunction.VARS.ContainsKey(varName))

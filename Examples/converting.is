@@ -5,7 +5,7 @@ def TryToConvert
 {
     if ConvertToInt($0) == Error
     {
-        Write("Cannot convert the value!")
+        Write("Cannot convert the value!", RED)
         Exit(1);
     }
     else

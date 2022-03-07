@@ -12,8 +12,23 @@ public static class Program
         }
         string fileName = args[0];
         string fileContent = File.ReadAllText(fileName);
+        string finalContent = String.Empty;
+
+        foreach (string line in fileContent.Split('\n'))
+        {
+            if (line.Contains("@use"))
+            {
+                finalContent += File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "Lib\\"+line.Remove(0, line.IndexOf(' ')).Replace(";", "").Trim() + ".is");
+            }
+            if (line.Contains("#use"))
+            {
+                finalContent += File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + line.Remove(0, line.IndexOf(' ')).Replace(";", "").Trim() + ".is");
+            }
+        }
+
+        finalContent += fileContent;
         
-        AntlrInputStream inputStream = new(fileContent);
+        AntlrInputStream inputStream = new(finalContent);
         IterkoczeScriptLexer IterkoczeLexer = new(inputStream);
         CommonTokenStream commonTokenStream = new(IterkoczeLexer);
         IterkoczeScriptParser IterkoczeParser = new(commonTokenStream);
