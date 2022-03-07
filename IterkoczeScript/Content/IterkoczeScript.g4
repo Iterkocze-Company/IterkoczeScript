@@ -7,13 +7,15 @@ statement: (assingment | functionCall | returnStatement) ';';
 
 returnStatement: 'return' expression;
 
-ifBlock: 'if' expression block ('else' elseIfBlock)?;
+ifBlock: IF expression block ('else' elseIfBlock)?;
 
 elseIfBlock: block | ifBlock;
 
 whileBlock: WHILE expression block ('else' elseIfBlock);
 
 WHILE: 'while';
+
+IF: 'if';
 
 functionDefinition: DEFINE IDENTIFIER block;
 
@@ -43,7 +45,7 @@ addOp: '+' | '-';
 compareOp: '==' | '!=' | '>' | '<' | '>=' | '<=';
 booleanOp: BOOLEAN_OPERATOR;
 
-BOOLEAN_OPERATOR: 'and' | 'or' | 'xor';
+BOOLEAN_OPERATOR: 'and' | 'or' | 'is not';
     
 constant: INTEGER | FLOAT | STRING | BOOLEAN | NULL;
 

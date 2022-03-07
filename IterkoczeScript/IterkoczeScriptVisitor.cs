@@ -14,12 +14,16 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
 
     public IterkoczeScriptVisitor()
     {
-        VARS["PI"] = Math.PI;
+        mainFunction.VARS["PI"] = Math.PI;
 
         STANDARD_FUNCTIONS["Write"] = new Func<object?[], object?>(StandardFunctions.Write);
         STANDARD_FUNCTIONS["WriteToFile"] = new Func<object?[], object?>(StandardFunctions.WriteToFile);
+        STANDARD_FUNCTIONS["ReadFromFile"] = new Func<object?[], object?>(StandardFunctions.ReadFromFile);
         STANDARD_FUNCTIONS["Read"] = new Func<object?[], object?>(StandardFunctions.Read);
         STANDARD_FUNCTIONS["ReadAsInt"] = new Func<object?[], object?>(StandardFunctions.ReadAsInt);
+        STANDARD_FUNCTIONS["Exit"] = new Func<object?[], object?>(StandardFunctions.Exit);
+        
+        STANDARD_FUNCTIONS["ConvertToInt"] = new Func<object?[], object?>(StandardFunctions.ConvertToInt);
     }
 
     public override object? VisitAssingment(IterkoczeScriptParser.AssingmentContext context)
@@ -29,6 +33,25 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         currentFunction.VARS[varName] = value;
 
         return currentFunction.VARS[varName];
+    }
+
+    public override object? VisitIfBlock(IterkoczeScriptParser.IfBlockContext context)
+    {
+        Func<object?, bool> condition = context.IF().GetText() == "if"
+                ? IsTrue
+                : IsFalse
+            ;
+
+        if(condition(Visit(context.expression())))
+        { 
+            Visit(context.block());
+        }
+        else if (context.elseIfBlock() != null)
+        {
+            Visit(context.elseIfBlock());
+        }
+        
+        return null;
     }
 
     public override object? VisitFunctionCall(IterkoczeScriptParser.FunctionCallContext context)
@@ -180,12 +203,26 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
 
         return op switch
         {
-            //"==" => IsEqual(left, right),
+            "==" => Compare.IsEqual(left, right),
             //"!=" => IsEqual(left, right),
             ">" => Compare.GreaterThan(left, right),
             "<" => Compare.LessThan(left, right),
             //">=" => IsEqual(left, right),
             //"<=" => IsEqual(left, right),
+            _ => throw new NotImplementedException()
+        };
+    }
+
+    public override object? VisitBooleanExp(IterkoczeScriptParser.BooleanExpContext context)
+    {
+        var left = Visit(context.expression(0));
+        var right = Visit(context.expression(1));
+
+        var op = context.booleanOp().GetText();
+
+        return op switch
+        {
+            "and" => IterkoczeBoolean.And(left, right),
             _ => throw new NotImplementedException()
         };
     }

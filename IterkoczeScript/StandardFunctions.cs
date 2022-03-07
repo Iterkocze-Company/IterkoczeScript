@@ -21,6 +21,13 @@ public class StandardFunctions
 
         return args[1];
     }
+    public static object? ReadFromFile(object?[] args)
+    {
+        if (args.Length != 1)
+            new Error("Function \"ReadFromFile\" expects 1 argument.");
+        
+        return File.ReadAllText(args[0].ToString());
+    }
     public static object? Read(object?[] args)
     {
         if (args.Length > 1)
@@ -38,5 +45,27 @@ public class StandardFunctions
         if (args.Length == 1)
             Console.Write(args[0]);
         return Convert.ToInt32(Console.ReadLine());
+    }
+    public static object? Exit(object?[] args)
+    {
+        if (args.Length != 1)
+            new Error("Function \"Exit\" expects 1 argument.");
+
+        Environment.Exit((int)args[0]);
+        return null;
+    }
+    //Convert Functions
+    public static object? ConvertToInt(object?[] args)
+    {
+        if (args.Length != 1)
+            new Error("Function \"ConvertToInt\" expects 1 argument.");
+
+        if (!int.TryParse(args[0].ToString(), out int output))
+        {
+            new Error($"ConvertToInt: Can't convert {args[0].GetType()} to int");
+            Environment.Exit(1);
+        }
+ 
+        return output;
     }
 }

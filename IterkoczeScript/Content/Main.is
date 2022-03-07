@@ -1,1 +1,6 @@
-Write("Result: " + WriteToFile("Output.txt", ReadAsInt("Type a number: ")*2));
+file = ReadFromFile("Output.txt");
+
+if ConvertToInt(file) == 24
+{
+    Write(file);
+}
