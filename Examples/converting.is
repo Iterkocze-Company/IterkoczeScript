@@ -3,7 +3,7 @@ val = 12;
 
 def TryToConvert
 {
-    if ConvertToInt($0) == Error
+    if ConvertToInt($0) == ERROR
     {
         Write("Cannot convert the value!", RED)
         Exit(1);
