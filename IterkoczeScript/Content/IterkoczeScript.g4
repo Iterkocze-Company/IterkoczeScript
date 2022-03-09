@@ -1,7 +1,7 @@
 grammar IterkoczeScript;
 
 program: line* EOF;
-line: statement | ifBlock | whileBlock | functionDefinition;
+line: statement | ifBlock | forBlock | whileBlock | functionDefinition;
 
 statement: (assingment | functionCall | returnStatement) ';';
 
@@ -10,6 +10,8 @@ useStatement: 'use' IDENTIFIER;
 returnStatement: 'return' expression;
 
 ifBlock: IF expression block ('else' elseIfBlock)?;
+
+forBlock: 'for' assingment expression block;
 
 elseIfBlock: block | ifBlock;
 
@@ -47,7 +49,7 @@ addOp: '+' | '-';
 compareOp: '==' | '!=' | '>' | '<' | '>=' | '<=';
 booleanOp: BOOLEAN_OPERATOR;
 
-BOOLEAN_OPERATOR: 'and' | 'or' | 'is not';
+BOOLEAN_OPERATOR: 'and' | 'or' | 'not';
     
 constant: INTEGER | FLOAT | STRING | BOOLEAN | NULL;
 

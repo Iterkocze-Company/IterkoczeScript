@@ -27,6 +27,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         STANDARD_FUNCTIONS["Read"] = new Func<object?[], object?>(StandardFunctions.Read);
         STANDARD_FUNCTIONS["ReadAsInt"] = new Func<object?[], object?>(StandardFunctions.ReadAsInt);
         STANDARD_FUNCTIONS["Exit"] = new Func<object?[], object?>(StandardFunctions.Exit);
+        STANDARD_FUNCTIONS["GetChar"] = new Func<object?[], object?>(StandardFunctions.GetChar);
         
         STANDARD_FUNCTIONS["ConvertToInt"] = new Func<object?[], object?>(StandardFunctions.ConvertToInt);
     }
@@ -38,6 +39,56 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         currentFunction.VARS[varName] = value;
 
         return currentFunction.VARS[varName];
+    }
+
+    public override object? VisitForBlock(IterkoczeScriptParser.ForBlockContext context)
+    {
+        int indexer = (int)VisitAssingment(context.assingment());
+        var condition = VisitExpression(context.expression());
+        var op = context.GetText();
+
+        currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = indexer;
+        
+        if (op.Contains('<')) 
+            goto LessThan;
+        if (op.Contains('>')) 
+            goto GreaterThan;
+        if (op.Contains(">=")) 
+            goto GreaterThanOrEqual;
+        if (op.Contains("<=")) 
+            goto LessThanOrEqual;
+
+        LessThan:
+        for (int i = indexer; i < (int)condition; i++)
+        {
+            VisitBlock(context.block());
+            currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+1;
+            indexer++;
+        }
+        GreaterThan:
+        for (int i = indexer; i > (int)condition; i++)
+        {
+            VisitBlock(context.block());
+            currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+1;
+            indexer++;
+        }
+        GreaterThanOrEqual:
+        for (int i = indexer; i >= (int)condition; i++)
+        {
+            VisitBlock(context.block());
+            currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+1;
+            indexer++;
+        }
+        LessThanOrEqual:
+        for (int i = indexer; i <= (int)condition; i++)
+        {
+            VisitBlock(context.block());
+            currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+1;
+            indexer++;
+        }
+        
+        currentFunction.VARS.Remove(context.assingment().IDENTIFIER().ToString());
+        return null;
     }
 
     public override object? VisitIfBlock(IterkoczeScriptParser.IfBlockContext context)
@@ -216,7 +267,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         return op switch
         {
             "==" => Compare.IsEqual(left, right),
-            //"!=" => IsEqual(left, right),
+            "!=" => Compare.IsNotEqual(left, right),
             ">" => Compare.GreaterThan(left, right),
             "<" => Compare.LessThan(left, right),
             //">=" => IsEqual(left, right),
@@ -235,6 +286,8 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         return op switch
         {
             "and" => IterkoczeBoolean.And(left, right),
+            "or" => IterkoczeBoolean.Or(left, right),
+            "not" => IterkoczeBoolean.IsNot(left, right),
             _ => throw new NotImplementedException()
         };
     }

@@ -67,6 +67,13 @@ public class StandardFunctions
             Console.Write(args[0]);
         return Console.ReadLine();
     }
+    public static object? GetChar(object?[] args)
+    {
+        if (args.Length != 2)
+            new Error($"Function \"GetChar\" takes 2 arguments but got {args.Length}.");
+
+        return args[0].ToString()[(int)args[1]].ToString();
+    }
     public static object? ReadAsInt(object?[] args)
     {
         if (args.Length > 1)
