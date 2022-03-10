@@ -100,7 +100,7 @@ public class StandardFunctions
         if (!int.TryParse(args[0].ToString(), out int output))
         {
             //new Error($"ConvertToInt: Can't convert {args[0].GetType()} to int");
-            return "Error";
+            return "ERROR";
             //Environment.Exit(1);
         }
  

@@ -1,3 +1,4 @@
+using System.Data.SqlTypes;
 using System.Net.Sockets;
 using Antlr4.Runtime.Atn;
 using IterkoczeScript.Content;
@@ -19,7 +20,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         PREDEF_VARS["RED"] = ConsoleColor.Red;
         PREDEF_VARS["GREEN"] = ConsoleColor.Green;
         PREDEF_VARS["BLUE"] = ConsoleColor.Blue;
-        PREDEF_VARS["ERROR"] = "Error";
+        PREDEF_VARS["ERROR"] = "ERROR";
 
         STANDARD_FUNCTIONS["Write"] = new Func<object?[], object?>(StandardFunctions.Write);
         STANDARD_FUNCTIONS["WriteToFile"] = new Func<object?[], object?>(StandardFunctions.WriteToFile);
@@ -39,6 +40,94 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         currentFunction.VARS[varName] = value;
 
         return currentFunction.VARS[varName];
+    }
+
+    public override object? VisitBlock(IterkoczeScriptParser.BlockContext context)
+    {
+        foreach (var line in context.line())
+        {
+            if (line.GetText().Contains("def struct"))
+            {
+                Dictionary<string, object?> vars = new();
+                foreach (var line2 in context.line())
+                {
+                    if (line2.statement().structMemberDefinition() != null)
+                    {
+                        vars.Add(line2.statement().structMemberDefinition().IDENTIFIER().GetText(), null);
+                    }
+                }
+                return vars;
+            }
+        }
+        
+        return base.VisitBlock(context);
+    }
+
+    public override object? VisitStructDefinition(IterkoczeScriptParser.StructDefinitionContext context)
+    {
+        var name = context.IDENTIFIER().GetText();
+        var vars = VisitBlock(context.block());
+        
+        currentFunction.Structs.Add(new Struct(name, new Dictionary<string, object?>()));
+        
+        return null;
+    }
+
+    public override object? VisitStructCreation(IterkoczeScriptParser.StructCreationContext context)
+    {
+        var structInstanceName = context.IDENTIFIER(1).GetText();
+        var structTarget = context.IDENTIFIER(0).GetText();
+
+        foreach (var st in currentFunction.Structs)
+        {
+            if (st.Name == structTarget)
+                goto Continue;
+        }
+
+        new Error($"Struct {structTarget} does not exist but was attempted to be instancieted!");
+        
+        Continue:
+        foreach (Struct st in currentFunction.Structs)
+        {
+            try
+            {
+                if (st.Name == structTarget)
+                {
+                    currentFunction.StructInstances.Add(structInstanceName, st);
+                }
+            }
+            catch (Exception e)
+            {
+                new Error($"The struct {st.Name} has been defined more than once or has more than one instance of the same name!");
+            }
+        }
+        
+        return null;
+    }
+
+    public override object? VisitStructAssingment(IterkoczeScriptParser.StructAssingmentContext context)
+    {
+        var structInstanceName = context.IDENTIFIER(0).GetText();
+        var varName = context.IDENTIFIER(1).GetText();
+        var value = Visit(context.expression());
+
+        currentFunction.StructInstances[structInstanceName].Variables[varName] = value;
+        
+        return null;
+    }
+
+    public override object? VisitStructMemberAccess(IterkoczeScriptParser.StructMemberAccessContext context)
+    {
+        var structInstanceName = context.IDENTIFIER(0).GetText();
+        var varName = context.IDENTIFIER(1).GetText();
+        
+        if (!currentFunction.StructInstances.ContainsKey(structInstanceName))
+            new Error($"struct instance {structInstanceName} does not exist!");
+
+        if (!currentFunction.StructInstances[structInstanceName].Variables.ContainsKey(varName))
+            new Error($"The struct variable {varName} does not exist in struct {structInstanceName}!");
+        
+        return currentFunction.StructInstances[structInstanceName].Variables[varName];
     }
 
     public override object? VisitForBlock(IterkoczeScriptParser.ForBlockContext context)
@@ -97,6 +186,20 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
     {
         var variable = context.IDENTIFIER().GetText();
         var target = Visit(context.expression());
+
+        foreach (var st in currentFunction.Structs)
+        {
+            if (st.Name == target)
+            {
+                foreach (var v in currentFunction.StructInstances)
+                {
+                    currentFunction.StructInstances.Add(variable, new Struct(variable, currentFunction.StructInstances[v.Key].Variables));
+                    VisitBlock(context.block());
+                    currentFunction.StructInstances.Remove(variable);
+                }
+                return null;
+            }
+        }
 
         currentFunction.VARS[variable] = null;
 
@@ -190,6 +293,14 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         if (varName == "BLUE") return PREDEF_VARS[varName];
         if (varName == "PI") return PREDEF_VARS[varName];
 
+        foreach (var st in currentFunction.Structs)
+        {
+            if (st.Name == varName)
+            {
+                return st.Name;
+            }
+        }
+        
         if (!currentFunction.VARS.ContainsKey(varName))
         {
             new Error($"Variable {varName} is not defined!");
