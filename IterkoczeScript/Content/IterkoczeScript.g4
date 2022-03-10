@@ -11,7 +11,7 @@ returnStatement: 'return' expression;
 
 ifBlock: IF expression block ('else' elseIfBlock)?;
 
-forBlock: 'for' assingment expression block;
+forBlock: 'for' assingment ';' expression ';' INTEGER ';' block;
 
 elseIfBlock: block | ifBlock;
 

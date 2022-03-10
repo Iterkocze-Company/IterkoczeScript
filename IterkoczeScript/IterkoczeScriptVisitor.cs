@@ -45,46 +45,48 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
     {
         int indexer = (int)VisitAssingment(context.assingment());
         var condition = VisitExpression(context.expression());
+        int adder = int.Parse(context.INTEGER().GetText());
         var op = context.GetText();
 
         currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = indexer;
         
-        if (op.Contains('<')) 
-            goto LessThan;
-        if (op.Contains('>')) 
-            goto GreaterThan;
         if (op.Contains(">=")) 
             goto GreaterThanOrEqual;
         if (op.Contains("<=")) 
             goto LessThanOrEqual;
+        if (op.Contains('<')) 
+            goto LessThan;
+        if (op.Contains('>')) 
+            goto GreaterThan;
+        
 
         LessThan:
-        for (int i = indexer; i < (int)condition; i++)
+        for (int i = indexer; i < (int)condition; i += adder)
         {
             VisitBlock(context.block());
-            currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+1;
-            indexer++;
+            currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+adder;
+            indexer += adder;
         }
         GreaterThan:
-        for (int i = indexer; i > (int)condition; i++)
+        for (int i = indexer; i > (int)condition; i += adder)
         {
             VisitBlock(context.block());
-            currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+1;
-            indexer++;
+            currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+adder;
+            indexer += adder;
         }
         GreaterThanOrEqual:
-        for (int i = indexer; i >= (int)condition; i++)
+        for (int i = indexer; i >= (int)condition; i += adder)
         {
             VisitBlock(context.block());
-            currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+1;
-            indexer++;
+            currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+adder;
+            indexer += adder;
         }
         LessThanOrEqual:
-        for (int i = indexer; i <= (int)condition; i++)
+        for (int i = indexer; i <= (int)condition; i += adder)
         {
             VisitBlock(context.block());
-            currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+1;
-            indexer++;
+            currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+adder;
+            indexer += adder;
         }
         
         currentFunction.VARS.Remove(context.assingment().IDENTIFIER().ToString());
