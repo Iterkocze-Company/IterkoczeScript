@@ -1,0 +1,6 @@
+@use Utility;
+
+if GetStrLen("Hello") == 5
+{
+    Write("The length of the string is 5", BLUE);
+}
