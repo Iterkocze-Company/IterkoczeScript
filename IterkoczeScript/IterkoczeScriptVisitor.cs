@@ -93,6 +93,23 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         return null;
     }
 
+    public override object? VisitForeachBlock(IterkoczeScriptParser.ForeachBlockContext context)
+    {
+        var variable = context.IDENTIFIER().GetText();
+        var target = Visit(context.expression());
+
+        currentFunction.VARS[variable] = null;
+
+        foreach (var v in target.ToString())
+        {
+            currentFunction.VARS[variable] = v;
+            Visit(context.block());
+        }
+
+        currentFunction.VARS.Remove(variable);
+        return null;
+    }
+
     public override object? VisitIfBlock(IterkoczeScriptParser.IfBlockContext context)
     {
         Func<object?, bool> condition = context.IF().GetText() == "if"

@@ -1,7 +1,7 @@
 grammar IterkoczeScript;
 
 program: line* EOF;
-line: statement | ifBlock | forBlock | whileBlock | functionDefinition;
+line: statement | ifBlock | forBlock | whileBlock | foreachBlock | functionDefinition;
 
 statement: (assingment | functionCall | returnStatement) ';';
 
@@ -12,6 +12,8 @@ returnStatement: 'return' expression;
 ifBlock: IF expression block ('else' elseIfBlock)?;
 
 forBlock: 'for' assingment ';' expression ';' INTEGER ';' block;
+
+foreachBlock: 'foreach' IDENTIFIER 'in' expression block;
 
 elseIfBlock: block | ifBlock;
 

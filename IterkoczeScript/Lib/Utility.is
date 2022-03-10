@@ -1,0 +1,10 @@
+def GetStrLen
+{
+    len = 0;
+
+    foreach c in $0
+    {
+        len = len + 1;
+    }
+    return len;
+}
