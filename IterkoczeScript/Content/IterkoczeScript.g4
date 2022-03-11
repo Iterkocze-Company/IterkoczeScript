@@ -1,19 +1,13 @@
 grammar IterkoczeScript;
 
 program: line* EOF;
-line: statement | ifBlock | forBlock | whileBlock | foreachBlock | functionDefinition | structDefinition;
+line: statement | ifBlock | forBlock | whileBlock | foreachBlock | functionDefinition;
 
-statement: (assingment | structMemberDefinition | structCreation | structAssingment | functionCall | returnStatement) ';';
+statement: (assingment | functionCall | returnStatement) ';';
 
-structCreation: 'new' IDENTIFIER IDENTIFIER;
-
-structAssingment: IDENTIFIER '.' IDENTIFIER '=' expression;
-
-//structMemberAccess: IDENTIFIER '.' IDENTIFIER;
+useStatement: 'use' IDENTIFIER;
 
 returnStatement: 'return' expression;
-
-structDefinition: DEFINE 'struct' IDENTIFIER block;
 
 ifBlock: IF expression block ('else' elseIfBlock)?;
 
@@ -35,15 +29,12 @@ functionCall: IDENTIFIER '(' (expression (',' expression)*)? ')';
 
 DEFINE: 'def' | 'define';
 
-structMemberDefinition: IDENTIFIER;
-
 assingment: IDENTIFIER '=' expression;
 
 expression
     : constant                              #constantExp
     | '$' INTEGER                           #argumentIdentifierExp
     | returnStatement                       #returnStatementExp
-    | IDENTIFIER '.' IDENTIFIER             #structMemberAccess
     | IDENTIFIER                            #identifierExp
     | functionCall                          #functionCallExp
     | functionDefinition                    #functionDefinitionExp
