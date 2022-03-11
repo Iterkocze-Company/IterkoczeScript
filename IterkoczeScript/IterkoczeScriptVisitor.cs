@@ -120,7 +120,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         var vars = VisitBlock(context.block());
         var structName = context.IDENTIFIER().GetText();
         
-        currentFunction.Structs.Add(new (structName, (Dictionary<string, object?>)vars));
+        currentFunction.Structs.Add(new Struct(structName, (Dictionary<string, object?>)vars));
         
         return null;
     }
@@ -145,7 +145,12 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
             {
                 if (st.Name == structTarget)
                 {
-                    currentFunction.StructInstances.Add(structInstanceName, st);
+                    var dic = new Dictionary<string, object?>();
+                    foreach (var VAR in st.Variables)
+                    {
+                        dic.Add(VAR.Key, null);
+                    }
+                    currentFunction.StructInstances.Add(structInstanceName, new Struct(st.Name, dic));
                 }
             }
             catch (Exception e)
@@ -162,7 +167,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         var structInstanceName = context.IDENTIFIER(0).GetText();
         var varName = context.IDENTIFIER(1).GetText();
         var value = Visit(context.expression());
-
+        
         currentFunction.StructInstances[structInstanceName].Variables[varName] = value;
         
         return null;
