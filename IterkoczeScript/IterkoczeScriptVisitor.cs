@@ -19,7 +19,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         PREDEF_VARS["RED"] = ConsoleColor.Red;
         PREDEF_VARS["GREEN"] = ConsoleColor.Green;
         PREDEF_VARS["BLUE"] = ConsoleColor.Blue;
-        PREDEF_VARS["ERROR"] = "Error";
+        PREDEF_VARS["ERROR"] = "ERROR";
 
         STANDARD_FUNCTIONS["Write"] = new Func<object?[], object?>(StandardFunctions.Write);
         STANDARD_FUNCTIONS["WriteToFile"] = new Func<object?[], object?>(StandardFunctions.WriteToFile);
@@ -147,9 +147,8 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
                 {
                     var dic = new Dictionary<string, object?>();
                     foreach (var VAR in st.Variables)
-                    {
                         dic.Add(VAR.Key, null);
-                    }
+                    
                     currentFunction.StructInstances.Add(structInstanceName, new Struct(st.Name, dic));
                 }
             }
@@ -158,7 +157,6 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
                 new Error($"The struct {st.Name} has been defined more than once or has more than one instance of the same name!");
             }
         }
-        
         return null;
     }
 
@@ -300,11 +298,17 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
     {
         var varName = context.IDENTIFIER().GetText();
 
-        if (varName == "ERROR") return PREDEF_VARS[varName];
+        foreach (var VAR in PREDEF_VARS)
+        {
+            if (VAR.Key == varName)
+                return PREDEF_VARS[varName];
+        }
+
+        /*if (varName == "ERROR") return PREDEF_VARS[varName];
         if (varName == "RED") return PREDEF_VARS[varName];
         if (varName == "GREEN") return PREDEF_VARS[varName];
         if (varName == "BLUE") return PREDEF_VARS[varName];
-        if (varName == "PI") return PREDEF_VARS[varName];
+        if (varName == "PI") return PREDEF_VARS[varName];*/
         
         foreach (var st in currentFunction.Structs)
         {
