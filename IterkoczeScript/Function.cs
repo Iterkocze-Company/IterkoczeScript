@@ -9,6 +9,8 @@ public class Function
     public string Name {get; set;}
     public object? ReturnValue { get; set; }
     public IterkoczeScriptParser.BlockContext Code {get; set;}
+    public List<Struct> Structs { get; set; } = new();
+    public Dictionary<string, Struct> StructInstances { get; set; } = new();
 
     public Function(string name, IterkoczeScriptParser.BlockContext code)
     {   

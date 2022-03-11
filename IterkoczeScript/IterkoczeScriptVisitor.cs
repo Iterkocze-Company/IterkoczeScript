@@ -93,10 +93,121 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         return null;
     }
 
+    public override object? VisitBlock(IterkoczeScriptParser.BlockContext context)
+    {
+        
+        foreach (var line in context.line())
+        {
+            if (line.statement().structMemberDefinition() != null)
+            {
+                Dictionary<string, object?> vars = new();
+                foreach (var line2 in context.line())
+                {
+                    if (line2.statement().structMemberDefinition() != null)
+                    {
+                        vars.Add(line2.statement().structMemberDefinition().IDENTIFIER().GetText(), null);
+                    }
+                }
+                return vars;
+            }
+        }
+        
+        return base.VisitBlock(context);
+    }
+
+    public override object? VisitStructDefinition(IterkoczeScriptParser.StructDefinitionContext context)
+    {
+        var vars = VisitBlock(context.block());
+        var structName = context.IDENTIFIER().GetText();
+        
+        currentFunction.Structs.Add(new (structName, (Dictionary<string, object?>)vars));
+        
+        return null;
+    }
+
+    public override object? VisitStructCreation(IterkoczeScriptParser.StructCreationContext context)
+    {
+        var structInstanceName = context.IDENTIFIER(1).GetText();
+        var structTarget = context.IDENTIFIER(0).GetText();
+
+        foreach (var st in currentFunction.Structs)
+        {
+            if (st.Name == structTarget)
+                goto Continue;
+        }
+
+        new Error($"Struct {structTarget} does not exist but was attempted to be instancieted!");
+        
+        Continue:
+        foreach (Struct st in currentFunction.Structs)
+        {
+            try
+            {
+                if (st.Name == structTarget)
+                {
+                    currentFunction.StructInstances.Add(structInstanceName, st);
+                }
+            }
+            catch (Exception e)
+            {
+                new Error($"The struct {st.Name} has been defined more than once or has more than one instance of the same name!");
+            }
+        }
+        
+        return null;
+    }
+
+    public override object? VisitStructAssingment(IterkoczeScriptParser.StructAssingmentContext context)
+    {
+        var structInstanceName = context.IDENTIFIER(0).GetText();
+        var varName = context.IDENTIFIER(1).GetText();
+        var value = Visit(context.expression());
+
+        currentFunction.StructInstances[structInstanceName].Variables[varName] = value;
+        
+        return null;
+    }
+    
+    public override object? VisitStructMemberAccess(IterkoczeScriptParser.StructMemberAccessContext context)
+    {
+        var structInstanceName = context.IDENTIFIER(0).GetText();
+        var varName = context.IDENTIFIER(1).GetText();
+        
+        if (!currentFunction.StructInstances.ContainsKey(structInstanceName))
+            new Error($"struct instance {structInstanceName} does not exist!");
+
+        if (!currentFunction.StructInstances[structInstanceName].Variables.ContainsKey(varName))
+            new Error($"The struct variable {varName} does not exist in struct {structInstanceName}!");
+        
+        return currentFunction.StructInstances[structInstanceName].Variables[varName];
+    }
+
     public override object? VisitForeachBlock(IterkoczeScriptParser.ForeachBlockContext context)
     {
         var variable = context.IDENTIFIER().GetText();
         var target = Visit(context.expression());
+
+        foreach (var st in currentFunction.Structs)
+        {
+            if (st.Name == target)
+            {
+                string[] Names = new string[currentFunction.StructInstances.Count];
+                int index = 0;
+                foreach (var name in currentFunction.StructInstances)
+                {
+                    Names[index] = name.Key;
+                    index++;
+                }
+                
+                for (int i = 0; i < currentFunction.StructInstances.Count; i++)
+                {
+                    currentFunction.StructInstances.Add(variable, new Struct(variable, currentFunction.StructInstances[Names[i]].Variables));
+                    VisitBlock(context.block());
+                    currentFunction.StructInstances.Remove(variable);
+                }
+                return null;
+            }
+        }
 
         currentFunction.VARS[variable] = null;
 
@@ -189,6 +300,14 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         if (varName == "GREEN") return PREDEF_VARS[varName];
         if (varName == "BLUE") return PREDEF_VARS[varName];
         if (varName == "PI") return PREDEF_VARS[varName];
+        
+        foreach (var st in currentFunction.Structs)
+        {
+            if (st.Name == varName)
+            {
+                return st.Name;
+            }
+        }
 
         if (!currentFunction.VARS.ContainsKey(varName))
         {

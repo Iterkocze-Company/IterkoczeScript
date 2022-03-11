@@ -1,6 +1,16 @@
-@use Utility;
-
-if GetStrLen("Hello") == 5
+def struct Person
 {
-    Write("The length of the string is 5", BLUE);
+    Name;
+    Age;
+}
+
+new Person P1;
+
+P1.Name = "Not John";
+P1.Age = 18;
+
+foreach p in Person
+{
+    Write(p.Name);
+    Write(p.Age);
 }
