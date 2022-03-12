@@ -1,12 +1,17 @@
-size = 10;
-
-new array vars[size];
-
-vars[0] = "Test";
-vars[1] = "Test2";
-vars[2] = "Test3";
-
-for i = 0; i <= size-1; 1
+def struct Person
 {
-    Write(vars[i]);
+    Name;
+    Age;
 }
+
+new Person P1;
+
+P1.Name = "John";
+P1.Age = 22;
+
+new array vars[1];
+
+vars[0] = P1;
+
+Write(vars[0].Name);
+Write(vars[0].Age);

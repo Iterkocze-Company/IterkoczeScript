@@ -74,6 +74,16 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         return currentFunction.Arrays[arrayName].GetValue((int)index);
     }
 
+    public override object? VisitArrayStructMemberAccessExp(IterkoczeScriptParser.ArrayStructMemberAccessExpContext context)
+    {
+        var arrayName = context.IDENTIFIER(0).GetText();
+        var index = Visit(context.expression());
+        var structMemberName = context.IDENTIFIER(1).GetText();
+        Struct structInstance = (Struct)currentFunction.Arrays[arrayName].GetValue((int) index);
+        
+        return structInstance.Variables[structMemberName];
+    }
+
     public override object? VisitForBlock(IterkoczeScriptParser.ForBlockContext context)
     {
         int indexer = (int)VisitAssingment(context.assingment());
@@ -349,6 +359,12 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
             {
                 return st.Name;
             }
+        }
+        
+        foreach (var st in currentFunction.StructInstances)
+        {
+            if (st.Key == varName)
+                return currentFunction.StructInstances[varName];
         }
 
         if (!currentFunction.VARS.ContainsKey(varName))

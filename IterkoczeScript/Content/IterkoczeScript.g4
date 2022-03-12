@@ -46,7 +46,8 @@ expression
     | '$' INTEGER                           #argumentIdentifierExp
     | returnStatement                       #returnStatementExp
     | IDENTIFIER '.' IDENTIFIER             #structMemberAccessExp
-    | IDENTIFIER '[' expression ']'            #arrayAccessExp
+    | IDENTIFIER '[' expression ']' '.' IDENTIFIER         #arrayStructMemberAccessExp
+    | IDENTIFIER '[' expression ']'         #arrayAccessExp
     | IDENTIFIER                            #identifierExp
     | functionCall                          #functionCallExp
     | functionDefinition                    #functionDefinitionExp
