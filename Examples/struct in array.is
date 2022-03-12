@@ -1,0 +1,17 @@
+def struct Person
+{
+    Name;
+    Age;
+}
+
+new Person P1;
+
+P1.Name = "John";
+P1.Age = 22;
+
+new array vars[1];
+
+vars[0] = P1;
+
+Write(vars[0].Name);
+Write(vars[0].Age);
