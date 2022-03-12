@@ -4,6 +4,9 @@ public static class Compare
 {
     public static bool GreaterThan(object? left, object? right)
     {
+        if (left == null || right == null) // I don't like the looks of this
+            return false;
+        
         if (left is int l && right is int r)
             return l > r;
         if (left is float lf && right is float rf)
@@ -18,6 +21,9 @@ public static class Compare
     }
     public static bool LessThan(object? left, object? right)
     {
+        if (left == null || right == null) // I don't like the looks of this
+            return false;
+        
         if (left is int l && right is int r)
             return l < r;
         if (left is float lf && right is float rf)
@@ -32,6 +38,9 @@ public static class Compare
     }
     public static bool IsEqual(object? left, object? right)
     {
+        if (left == null || right == null) // I don't like the looks of this
+            return false;
+        
         if (left is int l && right is int r)
             return l == r;
         if (left is float lf && right is float rf)

@@ -27,18 +27,14 @@ public class StandardFunctions
                     break;
                         
             }
-            //foreach (var arg in args)
-            //{
+            if (args[0] != null)
                 Console.WriteLine(args[0]);
-            //}
             Console.ForegroundColor = oldColour;
         }
         else
         {
-            //foreach (var arg in args)
-            //{
+            if (args[0] != null)
                 Console.WriteLine(args[0]);
-            //}
         }
 
         return null;

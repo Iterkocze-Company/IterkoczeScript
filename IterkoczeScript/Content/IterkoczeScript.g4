@@ -3,7 +3,7 @@ grammar IterkoczeScript;
 program: line* EOF;
 line: statement | ifBlock | forBlock | whileBlock | foreachBlock | functionDefinition | structDefinition;
 
-statement: (assingment | structMemberDefinition | structCreation | structAssingment | functionCall | returnStatement) ';';
+statement: (assingment | arrayCreation | structMemberDefinition | structCreation | structAssingment | functionCall | returnStatement) ';';
 
 structCreation: 'new' IDENTIFIER IDENTIFIER;
 
@@ -37,13 +37,16 @@ DEFINE: 'def' | 'define';
 
 structMemberDefinition: IDENTIFIER;
 
-assingment: IDENTIFIER '=' expression;
+assingment: IDENTIFIER '=' expression | (IDENTIFIER '[' INTEGER ']' '=' expression);
+
+arrayCreation: 'new array' IDENTIFIER '[' expression ']';
 
 expression
     : constant                              #constantExp
     | '$' INTEGER                           #argumentIdentifierExp
     | returnStatement                       #returnStatementExp
-    | IDENTIFIER '.' IDENTIFIER             #structMemberAccess
+    | IDENTIFIER '.' IDENTIFIER             #structMemberAccessExp
+    | IDENTIFIER '[' expression ']'            #arrayAccessExp
     | IDENTIFIER                            #identifierExp
     | functionCall                          #functionCallExp
     | functionDefinition                    #functionDefinitionExp

@@ -34,11 +34,44 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
 
     public override object? VisitAssingment(IterkoczeScriptParser.AssingmentContext context)
     {
-        var varName = context.IDENTIFIER().GetText();
-        var value = Visit(context.expression());
-        currentFunction.VARS[varName] = value;
+        if (context.INTEGER() != null) // It's an array
+        {
+            var arrayName = context.IDENTIFIER().GetText();
+            var index = context.INTEGER().GetText();
+            var value = Visit(context.expression());
 
-        return currentFunction.VARS[varName];
+            currentFunction.Arrays[arrayName].SetValue(value, int.Parse(index));
+            return null;
+        }
+        else
+        {
+            var varName = context.IDENTIFIER().GetText();
+            var value = Visit(context.expression());
+            currentFunction.VARS[varName] = value;
+
+            return currentFunction.VARS[varName];
+        }
+
+        new Error("[INTERPRETER ERROR] - An error occurred while visiting assingment!");
+        return null;
+    }
+
+    public override object? VisitArrayCreation(IterkoczeScriptParser.ArrayCreationContext context)
+    {
+        var arrayName = context.IDENTIFIER().GetText();
+        var arraySize = Visit(context.expression());
+
+        currentFunction.Arrays[arrayName] = new object?[(int)arraySize];
+        
+        return null;
+    }
+
+    public override object? VisitArrayAccessExp(IterkoczeScriptParser.ArrayAccessExpContext context)
+    {
+        var arrayName = context.IDENTIFIER().GetText();
+        var index = Visit(context.expression());
+        
+        return currentFunction.Arrays[arrayName].GetValue((int)index);
     }
 
     public override object? VisitForBlock(IterkoczeScriptParser.ForBlockContext context)
@@ -98,20 +131,26 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         
         foreach (var line in context.line())
         {
-            if (line.statement().structMemberDefinition() != null)
+            try
             {
-                Dictionary<string, object?> vars = new();
-                foreach (var line2 in context.line())
+                if (line.statement().structMemberDefinition() != null)
                 {
-                    if (line2.statement().structMemberDefinition() != null)
+                    Dictionary<string, object?> vars = new();
+                    foreach (var line2 in context.line())
                     {
-                        vars.Add(line2.statement().structMemberDefinition().IDENTIFIER().GetText(), null);
+                        if (line2.statement().structMemberDefinition() != null)
+                        {
+                            vars.Add(line2.statement().structMemberDefinition().IDENTIFIER().GetText(), null);
+                        }
                     }
+                    return vars;
                 }
-                return vars;
+            }
+            catch
+            {
+                //new Error("We need to fix something");
             }
         }
-        
         return base.VisitBlock(context);
     }
 
@@ -171,7 +210,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         return null;
     }
     
-    public override object? VisitStructMemberAccess(IterkoczeScriptParser.StructMemberAccessContext context)
+    public override object? VisitStructMemberAccessExp(IterkoczeScriptParser.StructMemberAccessExpContext context)
     {
         var structInstanceName = context.IDENTIFIER(0).GetText();
         var varName = context.IDENTIFIER(1).GetText();
@@ -297,18 +336,12 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
     public override object? VisitIdentifierExp(IterkoczeScriptParser.IdentifierExpContext context)
     {
         var varName = context.IDENTIFIER().GetText();
-
+        
         foreach (var VAR in PREDEF_VARS)
         {
             if (VAR.Key == varName)
                 return PREDEF_VARS[varName];
         }
-
-        /*if (varName == "ERROR") return PREDEF_VARS[varName];
-        if (varName == "RED") return PREDEF_VARS[varName];
-        if (varName == "GREEN") return PREDEF_VARS[varName];
-        if (varName == "BLUE") return PREDEF_VARS[varName];
-        if (varName == "PI") return PREDEF_VARS[varName];*/
         
         foreach (var st in currentFunction.Structs)
         {
@@ -336,7 +369,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         return op switch
         {
             "+" => IterkoczeMath.Add(left, right),
-            //"-" => Subtract(left, right),
+            "-" => IterkoczeMath.Subtract(left, right),
             _ => throw new NotImplementedException()
         };
     }
