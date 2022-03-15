@@ -39,7 +39,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
             var arrayName = context.IDENTIFIER().GetText();
             var index = context.INTEGER().GetText();
             var value = Visit(context.expression());
-
+            
             currentFunction.Arrays[arrayName].SetValue(value, int.Parse(index));
             return null;
         }
@@ -82,6 +82,9 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         Struct structInstance = (Struct)currentFunction.Arrays[arrayName].GetValue((int) index);
         
         return structInstance.Variables[structMemberName];
+
+        new Error("Undefined");
+        return null;
     }
 
     public override object? VisitForBlock(IterkoczeScriptParser.ForBlockContext context)

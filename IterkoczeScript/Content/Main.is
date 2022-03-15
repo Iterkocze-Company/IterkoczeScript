@@ -5,13 +5,16 @@ def struct Person
 }
 
 new Person P1;
+new Person P2;
 
 P1.Name = "John";
-P1.Age = 22;
+P1.Age = 18;
 
-new array vars[1];
+P2.Name = "James";
+P2.Age = 22;
 
-vars[0] = P1;
-
-Write(vars[0].Name);
-Write(vars[0].Age);
+foreach p in Person
+{
+    Write(p.Name);
+    Write(p.Age);
+}

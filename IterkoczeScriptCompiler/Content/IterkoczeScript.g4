@@ -5,7 +5,7 @@ line: statement | ifBlock | forBlock | whileBlock | foreachBlock | functionDefin
 
 statement: (assingment | arrayCreation | structMemberDefinition | structCreation | structAssingment | functionCall | returnStatement) ';';
 
-structCreation: 'new' IDENTIFIER IDENTIFIER?;
+structCreation: 'new' IDENTIFIER IDENTIFIER;
 
 structAssingment: IDENTIFIER '.' IDENTIFIER '=' expression; 
 
