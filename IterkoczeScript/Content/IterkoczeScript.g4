@@ -1,17 +1,22 @@
 grammar IterkoczeScript;
 
 program: line* EOF;
-line: statement | ifBlock | forBlock | whileBlock | foreachBlock | functionDefinition | structDefinition;
+line: statement | ifBlock | forBlock | whileBlock | foreachBlock | functionDefinition | structOperation;
 
-statement: (assingment | arrayCreation | structMemberDefinition | structCreation | structAssingment | functionCall | returnStatement) ';';
+statement: (assingment | listOperation | arrayCreation | structMemberDefinition | structOperation | functionCall | returnStatement) ';';
 
-structCreation: 'new' IDENTIFIER IDENTIFIER?;
+listOperation
+    : 'new List' IDENTIFIER                             #listCreation
+    | IDENTIFIER '.Add' '(' expression ')'              #listAddOperation
+    ;
 
-structAssingment: IDENTIFIER '.' IDENTIFIER '=' expression; 
+structOperation
+    : 'new' IDENTIFIER IDENTIFIER?              #structCreation
+    | IDENTIFIER '.' IDENTIFIER '=' expression  #structAssingment
+    | DEFINE 'struct' IDENTIFIER block          #structDefinition
+    ;
 
 returnStatement: 'return' expression;
-
-structDefinition: DEFINE 'struct' IDENTIFIER block;
 
 ifBlock: IF expression block ('else' elseIfBlock)?;
 
@@ -40,21 +45,21 @@ assingment: IDENTIFIER '=' expression | (IDENTIFIER '[' INTEGER ']' '=' expressi
 arrayCreation: 'new array' IDENTIFIER '[' expression ']';
 
 expression
-    : constant                              #constantExp
-    | '$' INTEGER                           #argumentIdentifierExp
-    | returnStatement                       #returnStatementExp
-    | IDENTIFIER '.' IDENTIFIER             #structMemberAccessExp
-    | IDENTIFIER '[' expression ']' '.' IDENTIFIER         #arrayStructMemberAccessExp
-    | IDENTIFIER '[' expression ']'         #arrayAccessExp
-    | IDENTIFIER                            #identifierExp
-    | functionCall                          #functionCallExp
-    | functionDefinition                    #functionDefinitionExp
-    | '(' expression ')'                    #parenthesizedExp
-    | '!' expression                        #notExp
-    | expression mulOp expression           #mulExp
-    | expression addOp expression           #addExp
-    | expression compareOp expression       #compareExp
-    | expression booleanOp expression       #booleanExp
+    : constant                                              #constantExp
+    | '$' INTEGER                                           #argumentIdentifierExp
+    | returnStatement                                       #returnStatementExp
+    | IDENTIFIER '.' IDENTIFIER                             #structMemberAccessExp
+    | IDENTIFIER '[' expression ']' '.' IDENTIFIER          #arrayStructMemberAccessExp
+    | IDENTIFIER '[' expression ']'                         #arrayAccessExp
+    | IDENTIFIER                                            #identifierExp
+    | functionCall                                          #functionCallExp
+    | functionDefinition                                    #functionDefinitionExp
+    | '(' expression ')'                                    #parenthesizedExp
+    | '!' expression                                        #notExp
+    | expression mulOp expression                           #mulExp
+    | expression addOp expression                           #addExp
+    | expression compareOp expression                       #compareExp
+    | expression booleanOp expression                       #booleanExp
     ;
     
 mulOp: '*' | '/' | '%';

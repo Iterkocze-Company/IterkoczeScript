@@ -32,6 +32,25 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         STANDARD_FUNCTIONS["ConvertToInt"] = new Func<object?[], object?>(StandardFunctions.ConvertToInt);
     }
 
+    public override object? VisitListCreation(IterkoczeScriptParser.ListCreationContext context)
+    {
+        var listName = context.IDENTIFIER().GetText();
+        
+        currentFunction.Lists[listName] = new List<object?>();
+        
+        return null;
+    }
+
+    public override object? VisitListAddOperation(IterkoczeScriptParser.ListAddOperationContext context)
+    {
+        var listName = context.IDENTIFIER().GetText();
+        var value = Visit(context.expression());
+        
+        currentFunction.Lists[listName].Add(value);
+        
+        return base.VisitListAddOperation(context);
+    }
+
     public override object? VisitAssingment(IterkoczeScriptParser.AssingmentContext context)
     {
         if (context.INTEGER() != null) // It's an array
@@ -70,8 +89,19 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
     {
         var arrayName = context.IDENTIFIER().GetText();
         var index = Visit(context.expression());
-        
-        return currentFunction.Arrays[arrayName].GetValue((int)index);
+
+        foreach (var VARIABLE in currentFunction.Arrays) //If it's an array
+        {
+            if (VARIABLE.Key == arrayName)
+                return currentFunction.Arrays[arrayName].GetValue((int)index);
+        }
+        foreach (var VARIABLE in currentFunction.Lists) //If it's a List
+        {
+            if (VARIABLE.Key == arrayName)
+                return currentFunction.Lists[arrayName][(int)index];
+        }
+
+        return null;
     }
 
     public override object? VisitArrayStructMemberAccessExp(IterkoczeScriptParser.ArrayStructMemberAccessExpContext context)
@@ -264,6 +294,21 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
             }
         }
 
+        foreach (var VARIABLE in currentFunction.Lists)
+        {
+            if (target is List<object?>)
+            {
+                foreach (var VARIABLE2 in (List<object?>)target)
+                {
+                    currentFunction.VARS[variable] = VARIABLE2;
+                    Visit(context.block());
+                }
+                currentFunction.VARS.Remove(variable);
+            }
+
+            return null;
+        }
+
         currentFunction.VARS[variable] = null;
 
         foreach (var v in target.ToString())
@@ -368,6 +413,12 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         {
             if (st.Key == varName)
                 return currentFunction.StructInstances[varName];
+        }
+        
+        foreach (var list in currentFunction.Lists)
+        {
+            if (list.Key == varName)
+                return currentFunction.Lists[varName];
         }
 
         if (!currentFunction.VARS.ContainsKey(varName))

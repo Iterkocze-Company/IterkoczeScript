@@ -12,6 +12,7 @@ public class Function
     public List<Struct> Structs { get; set; } = new();
     public Dictionary<string, Struct> StructInstances { get; set; } = new();
     public Dictionary<string, Array> Arrays { get; set; } = new();
+    public Dictionary<string, List<object?>> Lists { get; set; } = new();
 
     public Function(string name, IterkoczeScriptParser.BlockContext code)
     {   
