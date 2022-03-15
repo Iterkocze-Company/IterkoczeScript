@@ -1,13 +1,7 @@
-new List L1;
-
-L1.Add(12);
-L1.Add(16);
-L1.Add(80);
-L1.Add(46);
-
-L1.Add("Hello");
-
-foreach val in L1
+def Test
 {
-    Write(val);
+    return 1;
+    return 2;
 }
+
+Write(Test());

@@ -369,7 +369,9 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
 
     public override object? VisitReturnStatement(IterkoczeScriptParser.ReturnStatementContext context)
     { 
-        currentFunction.ReturnValue = Visit(context.expression());
+        //TODO: It's good for now...?
+        if (currentFunction.ReturnValue == null)
+            currentFunction.ReturnValue = Visit(context.expression());
         return null;
     }
 
