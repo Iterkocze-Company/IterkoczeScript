@@ -1,7 +1,13 @@
 def Test
 {
     return 1;
+    Write("kek");
     return 2;
 }
 
 Write(Test());
+
+if Test() == 1
+{
+    Write("su");
+}

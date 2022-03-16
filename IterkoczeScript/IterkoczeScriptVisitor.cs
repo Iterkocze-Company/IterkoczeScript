@@ -31,6 +31,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         
         STANDARD_FUNCTIONS["ConvertToInt"] = new Func<object?[], object?>(StandardFunctions.ConvertToInt);
     }
+    
 
     public override object? VisitListCreation(IterkoczeScriptParser.ListCreationContext context)
     {
@@ -171,7 +172,6 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
 
     public override object? VisitBlock(IterkoczeScriptParser.BlockContext context)
     {
-        
         foreach (var line in context.line())
         {
             try
@@ -194,6 +194,14 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
                 //new Error("We need to fix something");
             }
         }
+
+        foreach (var line in context.line())
+        { 
+            Visit(line);
+            if (currentFunction.ReturnValue != null)
+                return null;
+        }
+        
         return base.VisitBlock(context);
     }
 
