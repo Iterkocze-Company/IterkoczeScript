@@ -195,12 +195,12 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
             }
         }
 
-        foreach (var line in context.line())
+        /*foreach (var line in context.line())
         { 
             Visit(line);
             if (currentFunction.ReturnValue != null)
                 return null;
-        }
+        }*/
         
         return base.VisitBlock(context);
     }
@@ -517,6 +517,20 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         return null;
     }
 
+    public override object? VisitNotExp(IterkoczeScriptParser.NotExpContext context)
+    {
+        var left = Visit(context.expression());
+
+        var op = context.INVERT_OPERATOR().GetText();
+
+        return op switch
+        {
+            "!" => IterkoczeBoolean.Not(left),
+            "not" => IterkoczeBoolean.Not(left),
+            _ => throw new NotImplementedException()
+        };
+    }
+
     public override object? VisitCompareExp(IterkoczeScriptParser.CompareExpContext context)
     {
         var left = Visit(context.expression(0));
@@ -547,10 +561,11 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         {
             "and" => IterkoczeBoolean.And(left, right),
             "or" => IterkoczeBoolean.Or(left, right),
-            "not" => IterkoczeBoolean.IsNot(left, right),
             _ => throw new NotImplementedException()
         };
     }
+
+    
 
     private bool IsTrue(object? value)
     {

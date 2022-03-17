@@ -1,3 +1,5 @@
+using System.Media;
+
 namespace IterkoczeScript;
 
 public class StandardFunctions
@@ -87,6 +89,17 @@ public class StandardFunctions
         Environment.Exit((int)args[0]);
         return null;
     }
+    /*public static object? Beep(object?[] args)
+    {
+        if (args.Length > 1)
+            new Error("Function \"Beep\" expects 1 optional argument.");
+
+        if (args.Length == 1)
+            Console.Beep(1000, (int)args[0]);
+        else
+            Console.Beep(1000, 1000);
+        return null;
+    }*/
     //Convert Functions
     public static object? ConvertToInt(object?[] args)
     {

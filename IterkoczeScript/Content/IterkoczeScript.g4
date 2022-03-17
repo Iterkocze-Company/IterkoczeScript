@@ -55,7 +55,7 @@ expression
     | functionCall                                          #functionCallExp
     | functionDefinition                                    #functionDefinitionExp
     | '(' expression ')'                                    #parenthesizedExp
-    | '!' expression                                        #notExp
+    | INVERT_OPERATOR expression                            #notExp
     | expression mulOp expression                           #mulExp
     | expression addOp expression                           #addExp
     | expression compareOp expression                       #compareExp
@@ -67,7 +67,8 @@ addOp: '+' | '-';
 compareOp: '==' | '!=' | '>' | '<' | '>=' | '<=';
 booleanOp: BOOLEAN_OPERATOR;
 
-BOOLEAN_OPERATOR: 'and' | 'or' | 'not';
+BOOLEAN_OPERATOR: 'and' | 'or';
+INVERT_OPERATOR: 'not' | '!';
     
 constant: INTEGER | FLOAT | STRING | BOOLEAN | NULL;
 
