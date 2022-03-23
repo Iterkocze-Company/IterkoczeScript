@@ -1,0 +1,10 @@
+def Test
+{
+    x = 9;
+    Write(x);
+}
+
+Test();
+x = 10;
+Write(x);
+Test();

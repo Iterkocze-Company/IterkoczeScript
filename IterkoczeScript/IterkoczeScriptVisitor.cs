@@ -361,7 +361,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
                 currentFunction.args = args;
                 currentFunction = function;
                 VisitBlock(function.Code);
-                //currentFunction.VARS = VARS;
+                currentFunction.VARS = VARS;
                 return function.ReturnValue;
             }
         }
@@ -545,7 +545,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
             ">" => Compare.GreaterThan(left, right),
             "<" => Compare.LessThan(left, right),
             //">=" => IsEqual(left, right),
-            //"<=" => IsEqual(left, right),
+            "<=" => Compare.LessOrEqual(left, right),
             _ => throw new NotImplementedException()
         };
     }
