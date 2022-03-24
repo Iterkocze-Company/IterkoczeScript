@@ -36,9 +36,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
     public override object? VisitListCreation(IterkoczeScriptParser.ListCreationContext context)
     {
         var listName = context.IDENTIFIER().GetText();
-        
         currentFunction.Lists[listName] = new List<object?>();
-        
         return null;
     }
 
@@ -46,10 +44,36 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
     {
         var listName = context.IDENTIFIER().GetText();
         var value = Visit(context.expression());
+        if (currentFunction.Lists.ContainsKey(listName))
+            currentFunction.Lists[listName].Add(value);
+        else
+            new Error($"List {listName} does not exist, but you tried to invoke `Add`");
         
-        currentFunction.Lists[listName].Add(value);
+        return base.VisitListAddOperation(context); // Is this here for a reason? I can't remember
+    }
+
+    public override object? VisitListRemoveOperation(IterkoczeScriptParser.ListRemoveOperationContext context)
+    {
+        var listName = context.IDENTIFIER().GetText();
+        var value = Visit(context.expression());
+        if (currentFunction.Lists.ContainsKey(listName))
+            currentFunction.Lists[listName].Remove(value);
+        else
+            new Error($"List {listName} does not exist, but you tried to invoke `Remove`");
         
-        return base.VisitListAddOperation(context);
+        return null;
+    }
+
+    public override object? VisitListIndexOfOperation(IterkoczeScriptParser.ListIndexOfOperationContext context)
+    {
+        var listName = context.IDENTIFIER().GetText();
+        var value = Visit(context.expression());
+        if (currentFunction.Lists.ContainsKey(listName))
+            return currentFunction.Lists[listName].IndexOf(value);
+        else
+            new Error($"List {listName} does not exist, but you tried to invoke `IndexOf`");
+        
+        return null;
     }
 
     public override object? VisitAssingment(IterkoczeScriptParser.AssingmentContext context)
@@ -99,7 +123,15 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         foreach (var VARIABLE in currentFunction.Lists) //If it's a List
         {
             if (VARIABLE.Key == arrayName)
+            {
+                if (currentFunction.Lists[arrayName].Count <= (int)index)
+                {
+                    new Error($"Index {index} was out of bounds in the List {arrayName}!");
+                }
+                
                 return currentFunction.Lists[arrayName][(int)index];
+            }
+                
         }
 
         return null;

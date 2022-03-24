@@ -8,6 +8,8 @@ statement: (assingment | listOperation | arrayCreation | structMemberDefinition 
 listOperation
     : 'new List' IDENTIFIER                             #listCreation
     | IDENTIFIER '.Add' '(' expression ')'              #listAddOperation
+    | IDENTIFIER '.Remove' '(' expression ')'           #listRemoveOperation
+    | IDENTIFIER '.IndexOf' '(' expression ')'          #listIndexOfOperation
     ;
 
 structOperation
@@ -60,6 +62,7 @@ expression
     | expression addOp expression                           #addExp
     | expression compareOp expression                       #compareExp
     | expression booleanOp expression                       #booleanExp
+    | listOperation                                         #listOperationExp
     ;
     
 mulOp: '*' | '/' | '%';
