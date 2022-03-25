@@ -1,4 +1,1 @@
-Write(ArgumentCount()); //If we pass arguments to the Interpreter, like this: IterkoczeScript MyFile.is arg1 arg2. Function 'ArgumentCount' would return 2
-
-Write(Argument(0));  //This function gets the first argument passed to the program. So this would be 'arg1'
-Write(Argument(1));  //And this 'arg2'
+Write(ConvertToString(12));

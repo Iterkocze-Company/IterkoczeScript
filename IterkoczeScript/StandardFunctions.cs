@@ -89,6 +89,7 @@ public class StandardFunctions
         Environment.Exit((int)args[0]);
         return null;
     }
+    // Arguments
     public static object? Argument(object?[] args)
     {
         if (args.Length != 1)
@@ -117,5 +118,12 @@ public class StandardFunctions
         }
  
         return output;
+    }
+    public static object? ConvertToString(object?[] args)
+    {
+        if (args.Length != 1)
+            new Error("Function \"ConvertToString\" expects 1 argument.");
+ 
+        return args[0].ToString();
     }
 }

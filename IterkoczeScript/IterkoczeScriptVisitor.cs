@@ -33,6 +33,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         STANDARD_FUNCTIONS["GetChar"] = new Func<object?[], object?>(StandardFunctions.GetChar);
         
         STANDARD_FUNCTIONS["ConvertToInt"] = new Func<object?[], object?>(StandardFunctions.ConvertToInt);
+        STANDARD_FUNCTIONS["ConvertToString"] = new Func<object?[], object?>(StandardFunctions.ConvertToString);
     }
     
 
@@ -387,7 +388,6 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
     {
         var name = context.IDENTIFIER().GetText();
         var args = context.expression().Select(Visit).ToArray();
-
         foreach (Function function in FUNCTIONS)
         {
             if (function.Name == name)
