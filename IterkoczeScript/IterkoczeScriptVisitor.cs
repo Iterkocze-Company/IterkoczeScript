@@ -20,6 +20,9 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         PREDEF_VARS["GREEN"] = ConsoleColor.Green;
         PREDEF_VARS["BLUE"] = ConsoleColor.Blue;
         PREDEF_VARS["ERROR"] = "ERROR";
+        
+        STANDARD_FUNCTIONS["Argument"] = new Func<object?[], object?>(StandardFunctions.Argument);
+        STANDARD_FUNCTIONS["ArgumentCount"] = new Func<object?[], object?>(StandardFunctions.ArgumentCount);
 
         STANDARD_FUNCTIONS["Write"] = new Func<object?[], object?>(StandardFunctions.Write);
         STANDARD_FUNCTIONS["WriteToFile"] = new Func<object?[], object?>(StandardFunctions.WriteToFile);

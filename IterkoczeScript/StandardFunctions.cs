@@ -89,17 +89,20 @@ public class StandardFunctions
         Environment.Exit((int)args[0]);
         return null;
     }
-    /*public static object? Beep(object?[] args)
+    public static object? Argument(object?[] args)
     {
-        if (args.Length > 1)
-            new Error("Function \"Beep\" expects 1 optional argument.");
+        if (args.Length != 1)
+            new Error("Function \"Argument\" expects 1 argument.");
 
-        if (args.Length == 1)
-            Console.Beep(1000, (int)args[0]);
-        else
-            Console.Beep(1000, 1000);
-        return null;
-    }*/
+        return Program.ProgramArgs[(int)args[0]];
+    }
+    public static object? ArgumentCount(object?[] args)
+    {
+        if (args.Length != 0)
+            new Error("Function \"ArgumentCount\" expects 0 arguments.");
+
+        return Program.ProgramArgs.Length;
+    }
     //Convert Functions
     public static object? ConvertToInt(object?[] args)
     {

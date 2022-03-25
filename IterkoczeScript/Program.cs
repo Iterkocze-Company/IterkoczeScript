@@ -4,12 +4,16 @@ using IterkoczeScript.Content;
 
 public static class Program
 {
+    public static string[] ProgramArgs = null;
     public static void Main(string[] args)
     {
         if (args.Length == 0)
         {
             new Error("You need to provide a valid path for a script file.");
         }
+
+        ProgramArgs = new string[args.Length - 1];
+        Array.Copy(args, 1, ProgramArgs, 0, ProgramArgs.Length);
         string fileName = args[0];
         string fileContent = File.ReadAllText(fileName);
         string finalContent = String.Empty;
