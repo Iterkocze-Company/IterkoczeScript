@@ -1,0 +1,8 @@
+Changelog for version 1.0.0
+
+- Added standardization to the language,
+- Fixed the infinite for loop bug,
+- Changed `array` to `Array`,
+- Now you need to say what kind of "object" you are creating with the `new` keyword (ex. new Struct Person P1)
+- Deleted IterkoczeScriptCompiler,
+- More "careful" interpreter with more error detection

@@ -3,7 +3,7 @@ grammar IterkoczeScript;
 program: line* EOF;
 line: statement | ifBlock | forBlock | whileBlock | foreachBlock | functionDefinition | structOperation;
 
-statement: (assingment | listOperation | arrayCreation | structMemberDefinition | structOperation | functionCall | returnStatement) ';';
+statement: (arrayOperation | assingment | listOperation | structMemberDefinition | structOperation | functionCall | returnStatement) ';';
 
 listOperation
     : 'new List' IDENTIFIER                             #listCreation
@@ -13,22 +13,29 @@ listOperation
     ;
 
 structOperation
-    : 'new' IDENTIFIER IDENTIFIER?              #structCreation
-    | IDENTIFIER '.' IDENTIFIER '=' expression  #structAssingment
-    | DEFINE 'struct' IDENTIFIER block          #structDefinition
+    : 'new Struct' IDENTIFIER IDENTIFIER                #structCreation
+    | IDENTIFIER '.' IDENTIFIER '=' expression          #structAssingment
+    | DEFINE 'struct' IDENTIFIER block                  #structDefinition
+    ;
+    
+arrayOperation
+    : 'new Array' IDENTIFIER '[' expression ']'                 #arrayCreation
+    | IDENTIFIER '[' expression ']' '.' IDENTIFIER              #arrayStructMemberAccess
+    | IDENTIFIER '[' INTEGER ']' '=' expression                 #arrayAssingment
+    | IDENTIFIER '[' INTEGER ']' '.' IDENTIFIER '=' expression  #arrayStructMemberAccessAssingment
     ;
 
 returnStatement: 'return' expression;
 
-ifBlock: IF expression block ('else' elseIfBlock)?;
+ifBlock: IF '(' expression ')' block ('else' elseIfBlock)?;
 
-forBlock: 'for' assingment ';' expression ';' INTEGER ';' block;
+forBlock: 'for' '(' assingment ';' expression ';' INTEGER ')' block;
 
-foreachBlock: 'foreach' IDENTIFIER 'in' expression block;
+foreachBlock: 'foreach' '(' IDENTIFIER 'in' expression ')' block;
 
 elseIfBlock: block | ifBlock;
 
-whileBlock: WHILE expression block ('else' elseIfBlock);
+whileBlock: WHILE '(' expression ')' block ('else' elseIfBlock);
 
 WHILE: 'while';
 
@@ -42,16 +49,14 @@ DEFINE: 'def' | 'define';
 
 structMemberDefinition: IDENTIFIER;
 
-assingment: IDENTIFIER '=' expression | (IDENTIFIER '[' INTEGER ']' '=' expression);
-
-arrayCreation: 'new array' IDENTIFIER '[' expression ']';
+//arrayCreation: 'new Array' IDENTIFIER '[' expression ']';
 
 expression
     : constant                                              #constantExp
     | '$' INTEGER                                           #argumentIdentifierExp
     | returnStatement                                       #returnStatementExp
     | IDENTIFIER '.' IDENTIFIER                             #structMemberAccessExp
-    | IDENTIFIER '[' expression ']' '.' IDENTIFIER          #arrayStructMemberAccessExp
+    //| IDENTIFIER '[' expression ']' '.' IDENTIFIER          #arrayStructMemberAccessExp
     | IDENTIFIER '[' expression ']'                         #arrayAccessExp
     | IDENTIFIER                                            #identifierExp
     | functionCall                                          #functionCallExp
@@ -63,7 +68,11 @@ expression
     | expression compareOp expression                       #compareExp
     | expression booleanOp expression                       #booleanExp
     | listOperation                                         #listOperationExp
+    | arrayOperation                                        #arrayOperationExp
     ;
+    
+assingment: IDENTIFIER '=' expression;  
+//arrayAssingment: IDENTIFIER '[' INTEGER ']' '=' expression;
     
 mulOp: '*' | '/' | '%';
 addOp: '+' | '-';

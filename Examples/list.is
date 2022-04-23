@@ -7,7 +7,7 @@ L1.Add(46);
 
 L1.Add("Hello");
 
-foreach val in L1
+foreach (val in L1)
 {
     Write(val);
 }

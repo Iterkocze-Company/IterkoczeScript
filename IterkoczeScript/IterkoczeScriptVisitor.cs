@@ -82,33 +82,40 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
 
     public override object? VisitAssingment(IterkoczeScriptParser.AssingmentContext context)
     {
-        if (context.INTEGER() != null) // It's an array
-        {
-            var arrayName = context.IDENTIFIER().GetText();
-            var index = context.INTEGER().GetText();
-            var value = Visit(context.expression());
+        var varName = context.IDENTIFIER().GetText();
+        var value = Visit(context.expression());
+        currentFunction.VARS[varName] = value;
+
+        return currentFunction.VARS[varName];
+    }
+
+    public override object? VisitArrayAssingment(IterkoczeScriptParser.ArrayAssingmentContext context)
+    {
+        var arrayName = context.IDENTIFIER().GetText();
+        var index = context.INTEGER().GetText();
+        var value = Visit(context.expression());
             
-            currentFunction.Arrays[arrayName].SetValue(value, int.Parse(index));
-            return null;
-        }
-        else
+        try
         {
-            var varName = context.IDENTIFIER().GetText();
-            var value = Visit(context.expression());
-            currentFunction.VARS[varName] = value;
-
-            return currentFunction.VARS[varName];
+            currentFunction.Arrays[arrayName].SetValue(value, int.Parse(index));
         }
-
-        new Error("[INTERPRETER ERROR] - An error occurred while visiting assingment!");
+        catch
+        {
+            new Error($"Index {index} was out of bounds for array {arrayName} of size {Utility.GetRealArrayLenght(currentFunction.Arrays[arrayName])}.");
+        }
+        
         return null;
     }
 
     public override object? VisitArrayCreation(IterkoczeScriptParser.ArrayCreationContext context)
     {
         var arrayName = context.IDENTIFIER().GetText();
-        var arraySize = Visit(context.expression());
-
+        var arraySize = 0;// = Visit(context.expression());
+        if (context.expression() == null)
+        {
+            new Error($"Array \"{arrayName}\" has no size at declaration.");
+        }
+        arraySize = (int)Visit(context.expression());
         currentFunction.Arrays[arrayName] = new object?[(int)arraySize];
         
         return null;
@@ -122,7 +129,14 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         foreach (var VARIABLE in currentFunction.Arrays) //If it's an array
         {
             if (VARIABLE.Key == arrayName)
+            try
+            {
                 return currentFunction.Arrays[arrayName].GetValue((int)index);
+            }
+            catch
+            {
+                new Error($"Index {index} was out of bounds for array {arrayName} of size {Utility.GetRealArrayLenght(currentFunction.Arrays[arrayName])}.");
+            }
         }
         foreach (var VARIABLE in currentFunction.Lists) //If it's a List
         {
@@ -141,16 +155,36 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         return null;
     }
 
-    public override object? VisitArrayStructMemberAccessExp(IterkoczeScriptParser.ArrayStructMemberAccessExpContext context)
+    public override object? VisitArrayStructMemberAccess(IterkoczeScriptParser.ArrayStructMemberAccessContext context)
     {
         var arrayName = context.IDENTIFIER(0).GetText();
         var index = Visit(context.expression());
         var structMemberName = context.IDENTIFIER(1).GetText();
-        Struct structInstance = (Struct)currentFunction.Arrays[arrayName].GetValue((int) index);
         
-        return structInstance.Variables[structMemberName];
+        if (currentFunction.Arrays[arrayName].GetValue((int) index) is Struct)
+        {
+            Struct structInstance = (Struct)currentFunction.Arrays[arrayName].GetValue((int) index);
+            return structInstance.Variables[structMemberName];
+        }
+        
+        return currentFunction.Arrays[arrayName].GetValue((int) index);
+        
+        //return structInstance.Variables[structMemberName];
 
-        new Error("Undefined");
+        new Error("Undefined struct member");
+        return null;
+    }
+
+    public override object? VisitArrayStructMemberAccessAssingment(IterkoczeScriptParser.ArrayStructMemberAccessAssingmentContext context)
+    {
+        var arrayName = context.IDENTIFIER(0).GetText();
+        var index = context.INTEGER().GetText();
+        var structMemberName = context.IDENTIFIER(1).GetText();
+        var value = Visit(context.expression());
+
+
+        currentFunction.Arrays[arrayName].SetValue(value, int.Parse(index));
+        
         return null;
     }
 
@@ -180,6 +214,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
             currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+adder;
             indexer += adder;
         }
+        goto End;
         GreaterThan:
         for (int i = indexer; i > (int)condition; i += adder)
         {
@@ -187,6 +222,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
             currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+adder;
             indexer += adder;
         }
+        goto End;
         GreaterThanOrEqual:
         for (int i = indexer; i >= (int)condition; i += adder)
         {
@@ -194,6 +230,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
             currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+adder;
             indexer += adder;
         }
+        goto End;
         LessThanOrEqual:
         for (int i = indexer; i <= (int)condition; i += adder)
         {
@@ -201,7 +238,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
             currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+adder;
             indexer += adder;
         }
-        
+        End:
         currentFunction.VARS.Remove(context.assingment().IDENTIFIER().ToString());
         return null;
     }

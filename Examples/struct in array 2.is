@@ -1,0 +1,13 @@
+def struct Person
+{
+    Name;
+    Age;
+}
+
+new Array Persons[1];
+
+new Struct Person P1;
+Persons[0] = P1;
+Persons[0].Name = "hoh";
+
+Write(Persons[0].Name);

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "IterkoczeScript": {
+      "commandName": "Project",
+      "commandLineArgs": "Content/Main.is"
+    }
+  }
+}

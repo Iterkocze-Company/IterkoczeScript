@@ -1,1 +1,14 @@
-Write(ConvertToString(12));
+new Array A1[6];
+
+A1[0] = "H";
+A1[1] = "e";
+A1[2] = "l";
+A1[3] = "l";
+A1[4] = "o";
+A1[5] = "a";
+A1[6] = "a1";
+
+for (i = 0; i < 8; 1)
+{
+	Write(A1[i]);
+}
