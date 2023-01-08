@@ -14,8 +14,7 @@ public class Function
     public Dictionary<string, Array> Arrays { get; set; } = new();
     public Dictionary<string, List<object?>> Lists { get; set; } = new();
 
-    public Function(string name, IterkoczeScriptParser.BlockContext code)
-    {   
+    public Function(string name, IterkoczeScriptParser.BlockContext code) {   
         Name = name;
         Code = code;
     }

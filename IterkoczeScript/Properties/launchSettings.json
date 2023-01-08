@@ -2,7 +2,9 @@
   "profiles": {
     "IterkoczeScript": {
       "commandName": "Project",
-      "commandLineArgs": "Content/Main.is"
+      "commandLineArgs": "Main.is",
+      "workingDirectory": "F:\\Programowanko\\IterkoczeScript-main\\IterkoczeScript\\Content",
+      "hotReloadEnabled": false
     }
   }
 }

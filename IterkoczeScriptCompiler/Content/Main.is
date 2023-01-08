@@ -1,9 +1,0 @@
-def Functi
-{
-    return $0;
-}
-
-def Main
-{
-    Write(Functi(12, "Hello"));
-}

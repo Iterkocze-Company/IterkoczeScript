@@ -1,4 +1,4 @@
-def struct Person
+def Struct Person
 {
     Name;
     Age;
@@ -6,12 +6,12 @@ def struct Person
 
 new Struct Person P1;
 
-P1.Name = "John";
-P1.Age = 22;
+P1:Name = "John";
+P1:Age = 22;
 
 new Array vars[1];
 
 vars[0] = P1;
 
-Write(vars[0].Name);
-Write(vars[0].Age);
+Write(vars[0]:Name);
+Write(vars[0]:Age);

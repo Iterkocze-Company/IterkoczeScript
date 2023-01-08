@@ -5,10 +5,15 @@
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <IsPublishable>True</IsPublishable>
     </PropertyGroup>
 
     <ItemGroup>
       <Content Include="Content\IterkoczeScript.g4" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="..\.editorconfig" Link=".editorconfig" />
     </ItemGroup>
 
     <ItemGroup>

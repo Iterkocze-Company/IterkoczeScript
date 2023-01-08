@@ -1,11 +1,9 @@
-using System.Net.Sockets;
-using Antlr4.Runtime.Atn;
+using Antlr4.Runtime.Misc;
 using IterkoczeScript.Content;
 
 namespace IterkoczeScript;
 
-public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
-{
+public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
     private Dictionary<string, object?> VARS { get; } = new();
     private Dictionary<string, object?> PREDEF_VARS { get; } = new();
     private Dictionary<string, object?> STANDARD_FUNCTIONS { get; } = new();
@@ -36,52 +34,23 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         STANDARD_FUNCTIONS["ConvertToString"] = new Func<object?[], object?>(StandardFunctions.ConvertToString);
     }
     
-
-    public override object? VisitListCreation(IterkoczeScriptParser.ListCreationContext context)
-    {
+    public override object? VisitListCreation(IterkoczeScriptParser.ListCreationContext context) {
         var listName = context.IDENTIFIER().GetText();
         currentFunction.Lists[listName] = new List<object?>();
         return null;
     }
 
-    public override object? VisitListAddOperation(IterkoczeScriptParser.ListAddOperationContext context)
-    {
-        var listName = context.IDENTIFIER().GetText();
-        var value = Visit(context.expression());
-        if (currentFunction.Lists.ContainsKey(listName))
-            currentFunction.Lists[listName].Add(value);
-        else
-            new Error($"List {listName} does not exist, but you tried to invoke `Add`");
-        
-        return base.VisitListAddOperation(context); // Is this here for a reason? I can't remember
-    }
-
-    public override object? VisitListRemoveOperation(IterkoczeScriptParser.ListRemoveOperationContext context)
-    {
-        var listName = context.IDENTIFIER().GetText();
-        var value = Visit(context.expression());
-        if (currentFunction.Lists.ContainsKey(listName))
-            currentFunction.Lists[listName].Remove(value);
-        else
-            new Error($"List {listName} does not exist, but you tried to invoke `Remove`");
-        
-        return null;
-    }
-
-    public override object? VisitListIndexOfOperation(IterkoczeScriptParser.ListIndexOfOperationContext context)
-    {
+    /*public override object? VisitListIndexOfOperation(IterkoczeScriptParser.ListIndexOfOperationContext context) {
         var listName = context.IDENTIFIER().GetText();
         var value = Visit(context.expression());
         if (currentFunction.Lists.ContainsKey(listName))
             return currentFunction.Lists[listName].IndexOf(value);
         else
-            new Error($"List {listName} does not exist, but you tried to invoke `IndexOf`");
-        
+           _ = new Error($"List {listName} does not exist, but you tried to invoke `IndexOf`", context);
         return null;
-    }
+    }*/
 
-    public override object? VisitAssingment(IterkoczeScriptParser.AssingmentContext context)
-    {
+    public override object? VisitAssingment(IterkoczeScriptParser.AssingmentContext context) {
         var varName = context.IDENTIFIER().GetText();
         var value = Visit(context.expression());
         currentFunction.VARS[varName] = value;
@@ -89,107 +58,78 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         return currentFunction.VARS[varName];
     }
 
-    public override object? VisitArrayAssingment(IterkoczeScriptParser.ArrayAssingmentContext context)
-    {
+    public override object? VisitArrayAssingment(IterkoczeScriptParser.ArrayAssingmentContext context) {
         var arrayName = context.IDENTIFIER().GetText();
         var index = context.INTEGER().GetText();
         var value = Visit(context.expression());
             
-        try
-        {
+        try {
             currentFunction.Arrays[arrayName].SetValue(value, int.Parse(index));
         }
-        catch
-        {
-            new Error($"Index {index} was out of bounds for array {arrayName} of size {Utility.GetRealArrayLenght(currentFunction.Arrays[arrayName])}.");
+        catch {
+           _ = new Error($"Index {index} was out of bounds for array {arrayName} of size {Utility.GetRealArrayLenght(currentFunction.Arrays[arrayName])}.", context);
         }
-        
         return null;
     }
 
-    public override object? VisitArrayCreation(IterkoczeScriptParser.ArrayCreationContext context)
-    {
+    public override object? VisitArrayCreation(IterkoczeScriptParser.ArrayCreationContext context) {
         var arrayName = context.IDENTIFIER().GetText();
-        var arraySize = 0;// = Visit(context.expression());
-        if (context.expression() == null)
-        {
-            new Error($"Array \"{arrayName}\" has no size at declaration.");
+        var arraySize = 0;
+        if (context.expression() == null) {
+           _ = new Error($"Array \"{arrayName}\" has no size at declaration.", context);
         }
         arraySize = (int)Visit(context.expression());
         currentFunction.Arrays[arrayName] = new object?[(int)arraySize];
-        
         return null;
     }
 
-    public override object? VisitArrayAccessExp(IterkoczeScriptParser.ArrayAccessExpContext context)
-    {
+    public override object? VisitArrayAccessExp(IterkoczeScriptParser.ArrayAccessExpContext context) {
         var arrayName = context.IDENTIFIER().GetText();
         var index = Visit(context.expression());
 
-        foreach (var VARIABLE in currentFunction.Arrays) //If it's an array
-        {
+        foreach (var VARIABLE in currentFunction.Arrays) { //If it's an array
             if (VARIABLE.Key == arrayName)
-            try
-            {
+            try {
                 return currentFunction.Arrays[arrayName].GetValue((int)index);
             }
-            catch
-            {
-                new Error($"Index {index} was out of bounds for array {arrayName} of size {Utility.GetRealArrayLenght(currentFunction.Arrays[arrayName])}.");
+            catch {
+                _ = new Error($"Index {index} was out of bounds for array {arrayName} of size {Utility.GetRealArrayLenght(currentFunction.Arrays[arrayName])}.", context);
             }
         }
-        foreach (var VARIABLE in currentFunction.Lists) //If it's a List
-        {
-            if (VARIABLE.Key == arrayName)
-            {
-                if (currentFunction.Lists[arrayName].Count <= (int)index)
-                {
-                    new Error($"Index {index} was out of bounds in the List {arrayName}!");
+        foreach (var VARIABLE in currentFunction.Lists) { //If it's a List
+            if (VARIABLE.Key == arrayName) {
+                if (currentFunction.Lists[arrayName].Count <= (int)index) {
+                   _ = new Error($"Index {index} was out of bounds in the List {arrayName}!");
                 }
-                
                 return currentFunction.Lists[arrayName][(int)index];
             }
-                
         }
-
         return null;
     }
 
-    public override object? VisitArrayStructMemberAccess(IterkoczeScriptParser.ArrayStructMemberAccessContext context)
-    {
+    public override object? VisitArrayStructMemberAccess(IterkoczeScriptParser.ArrayStructMemberAccessContext context) {
         var arrayName = context.IDENTIFIER(0).GetText();
         var index = Visit(context.expression());
         var structMemberName = context.IDENTIFIER(1).GetText();
         
-        if (currentFunction.Arrays[arrayName].GetValue((int) index) is Struct)
-        {
+        if (currentFunction.Arrays[arrayName].GetValue((int) index) is Struct) {
             Struct structInstance = (Struct)currentFunction.Arrays[arrayName].GetValue((int) index);
             return structInstance.Variables[structMemberName];
         }
-        
         return currentFunction.Arrays[arrayName].GetValue((int) index);
-        
-        //return structInstance.Variables[structMemberName];
-
-        new Error("Undefined struct member");
-        return null;
     }
 
-    public override object? VisitArrayStructMemberAccessAssingment(IterkoczeScriptParser.ArrayStructMemberAccessAssingmentContext context)
-    {
+    public override object? VisitArrayStructMemberAccessAssingment(IterkoczeScriptParser.ArrayStructMemberAccessAssingmentContext context) {
         var arrayName = context.IDENTIFIER(0).GetText();
         var index = context.INTEGER().GetText();
         var structMemberName = context.IDENTIFIER(1).GetText();
         var value = Visit(context.expression());
 
-
         currentFunction.Arrays[arrayName].SetValue(value, int.Parse(index));
-        
         return null;
     }
 
-    public override object? VisitForBlock(IterkoczeScriptParser.ForBlockContext context)
-    {
+    public override object? VisitForBlock(IterkoczeScriptParser.ForBlockContext context) {
         int indexer = (int)VisitAssingment(context.assingment());
         var condition = VisitExpression(context.expression());
         int adder = int.Parse(context.INTEGER().GetText());
@@ -206,34 +146,29 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         if (op.Contains('>')) 
             goto GreaterThan;
         
-
         LessThan:
-        for (int i = indexer; i < (int)condition; i += adder)
-        {
+        for (int i = indexer; i < (int)condition; i += adder) {
             VisitBlock(context.block());
             currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+adder;
             indexer += adder;
         }
         goto End;
         GreaterThan:
-        for (int i = indexer; i > (int)condition; i += adder)
-        {
+        for (int i = indexer; i > (int)condition; i += adder) {
             VisitBlock(context.block());
             currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+adder;
             indexer += adder;
         }
         goto End;
         GreaterThanOrEqual:
-        for (int i = indexer; i >= (int)condition; i += adder)
-        {
+        for (int i = indexer; i >= (int)condition; i += adder) {
             VisitBlock(context.block());
             currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+adder;
             indexer += adder;
         }
         goto End;
         LessThanOrEqual:
-        for (int i = indexer; i <= (int)condition; i += adder)
-        {
+        for (int i = indexer; i <= (int)condition; i += adder) {
             VisitBlock(context.block());
             currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+adder;
             indexer += adder;
@@ -243,37 +178,23 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         return null;
     }
 
-    public override object? VisitBlock(IterkoczeScriptParser.BlockContext context)
-    {
-        foreach (var line in context.line())
-        {
-            try
-            {
-                if (line.statement().structMemberDefinition() != null)
-                {
+    public override object? VisitBlock(IterkoczeScriptParser.BlockContext context) {
+        foreach (var line in context.line()) {
+            try {
+                if (line.statement().structMemberDefinition() != null) {
                     Dictionary<string, object?> vars = new();
-                    foreach (var line2 in context.line())
-                    {
-                        if (line2.statement().structMemberDefinition() != null)
-                        {
+                    foreach (var line2 in context.line()) {
+                        if (line2.statement().structMemberDefinition() != null) {
                             vars.Add(line2.statement().structMemberDefinition().IDENTIFIER().GetText(), null);
                         }
                     }
                     return vars;
                 }
             }
-            catch
-            {
+            catch {
                 //new Error("We need to fix something");
             }
         }
-
-        /*foreach (var line in context.line())
-        { 
-            Visit(line);
-            if (currentFunction.ReturnValue != null)
-                return null;
-        }*/
         
         return base.VisitBlock(context);
     }
@@ -299,7 +220,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
                 goto Continue;
         }
 
-        new Error($"Struct {structTarget} does not exist but was attempted to be instancieted!");
+        new Error($"Struct {structTarget} does not exist but was attempted to be instancieted!", context);
         
         Continue:
         foreach (Struct st in currentFunction.Structs)
@@ -317,7 +238,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
             }
             catch (Exception e)
             {
-                new Error($"The struct {st.Name} has been defined more than once or has more than one instance of the same name!");
+                new Error($"The struct {st.Name} has been defined more than once or has more than one instance of the same name!", context);
             }
         }
         return null;
@@ -340,10 +261,10 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         var varName = context.IDENTIFIER(1).GetText();
         
         if (!currentFunction.StructInstances.ContainsKey(structInstanceName))
-            new Error($"struct instance {structInstanceName} does not exist!");
+            new Error($"struct instance {structInstanceName} does not exist!", context);
 
         if (!currentFunction.StructInstances[structInstanceName].Variables.ContainsKey(varName))
-            new Error($"The struct variable {varName} does not exist in struct {structInstanceName}!");
+            new Error($"The struct variable {varName} does not exist in struct {structInstanceName}!", context);
         
         return currentFunction.StructInstances[structInstanceName].Variables[varName];
     }
@@ -421,14 +342,16 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         return null;
     }
 
-    public override object? VisitFunctionCall(IterkoczeScriptParser.FunctionCallContext context)
-    {
+    public override object? VisitFunctionCall(IterkoczeScriptParser.FunctionCallContext context) {
         var name = context.IDENTIFIER().GetText();
+        string subjectName;
+        try {
+            subjectName = context.Parent.GetText().Remove(context.Parent.GetText().IndexOf('.')); // I can't just access `start` like a normal person *cries*
+        }
+        catch (Exception ex) { subjectName = null; }
         var args = context.expression().Select(Visit).ToArray();
-        foreach (Function function in FUNCTIONS)
-        {
-            if (function.Name == name)
-            {
+        foreach (Function function in FUNCTIONS) {
+            if (function.Name == name) {
                 function.args = args;
                 currentFunction.args = args;
                 currentFunction = function;
@@ -437,9 +360,23 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
                 return function.ReturnValue;
             }
         }
+
+        if (subjectName != null) {
+            if (name == "Add" && currentFunction.Lists.ContainsKey(subjectName)) {
+                ListOperations.Add(currentFunction.Lists[subjectName], args[0]);
+                return 0;
+            }
+            if (name == "Remove" && currentFunction.Lists.ContainsKey(subjectName)) {
+                ListOperations.Remove(currentFunction.Lists[subjectName], args[0]);
+                return 0;
+            }
+            if (name == "IndexOf" && currentFunction.Lists.ContainsKey(subjectName)) {
+                return ListOperations.IndefOf(currentFunction.Lists[subjectName], args[0]);
+            }
+        }
         
         if (!STANDARD_FUNCTIONS.ContainsKey(name))
-            new Error($"Function {name} is not defined!");
+            new Error($"Function {name} is not defined!", context);
 
         if (STANDARD_FUNCTIONS[name] is not Func<object?[], object?> func)
             throw new Exception($"variable {name} is not a function.");
@@ -461,7 +398,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         var code = context.block();
         
         if (VARS.ContainsKey(name))
-            new Error($"Function {name} was already defined!");
+            new Error($"Function {name} was already defined!", context);
         
         FUNCTIONS.Add(new Function(name, code));
 
@@ -505,7 +442,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
 
         if (!currentFunction.VARS.ContainsKey(varName))
         {
-            new Error($"Variable {varName} is not defined!");
+            new Error($"Variable {varName} is not defined!", context);
         }
 
         return currentFunction.VARS[varName];
@@ -541,29 +478,17 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
         };
     }
 
-    public override object? VisitConstant(IterkoczeScriptParser.ConstantContext context)
-    {
+    public override object? VisitConstant(IterkoczeScriptParser.ConstantContext context) {
         if (context.INTEGER() is { } i)
-        {
             return int.Parse(i.GetText());
-        }
         if (context.FLOAT() is { } f)
-        {
             return float.Parse(f.GetText());
-        }
         if (context.STRING() is { } s)
-        {
             return s.GetText()[1..^1];
-        }
         if (context.BOOLEAN() is { } b)
-        {
             return b.GetText() == "true";
-        }
         if (context.NULL() is { })
-        {
             return null;
-        }
-
         throw new NotImplementedException();
     }
 
@@ -636,8 +561,6 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?>
             _ => throw new NotImplementedException()
         };
     }
-
-    
 
     private bool IsTrue(object? value)
     {

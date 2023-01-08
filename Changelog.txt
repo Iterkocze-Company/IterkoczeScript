@@ -1,8 +1,13 @@
-Changelog for version 1.0.0
+Changelog for version 1.0.1
+	- Reworked method calling and struct member access,
+	- Struct access changed from `.` to `:`,
+	- Now errors display the line number and additional information,
+	- Interpreter will now return -1 instead of 1 when exiting on error,
 
-- Added standardization to the language,
-- Fixed the infinite for loop bug,
-- Changed `array` to `Array`,
-- Now you need to say what kind of "object" you are creating with the `new` keyword (ex. new Struct Person P1)
-- Deleted IterkoczeScriptCompiler,
-- More "careful" interpreter with more error detection
+Changelog for version 1.0.0
+	- Added standardization to the language,
+	- Fixed the infinite for loop bug,
+	- Changed `array` to `Array`,
+	- Now you need to say what kind of "object" you are creating with the `new` keyword (ex. new Struct Person P1)
+	- Deleted IterkoczeScriptCompiler,
+	- More "careful" interpreter with more error detection

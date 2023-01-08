@@ -1,11 +1,11 @@
-def struct Person
+def Struct Person
 {
     Name;
     Age;
 }
 
-new struct Person P1;
-new struct Person P2;
+new Struct Person P1;
+new Struct Person P2;
 
 P1.Name = "John";
 P1.Age = 18;
@@ -15,6 +15,6 @@ P2.Age = 22;
 
 foreach (p in Person)
 {
-    Write(p.Name);
-    Write(p.Age);
+    Write(p:Name);
+    Write(p:Age);
 }

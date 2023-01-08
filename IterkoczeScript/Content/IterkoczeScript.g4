@@ -3,26 +3,26 @@ grammar IterkoczeScript;
 program: line* EOF;
 line: statement | ifBlock | forBlock | whileBlock | foreachBlock | functionDefinition | structOperation;
 
-statement: (arrayOperation | assingment | listOperation | structMemberDefinition | structOperation | functionCall | returnStatement) ';';
+statement: (arrayOperation | assingment | listOperation | structMemberDefinition | structOperation | expression | functionCall | returnStatement) ';';
 
 listOperation
     : 'new List' IDENTIFIER                             #listCreation
-    | IDENTIFIER '.Add' '(' expression ')'              #listAddOperation
-    | IDENTIFIER '.Remove' '(' expression ')'           #listRemoveOperation
-    | IDENTIFIER '.IndexOf' '(' expression ')'          #listIndexOfOperation
+    //| IDENTIFIER '.Add' '(' expression ')'              #listAddOperation
+    //| IDENTIFIER '.Remove' '(' expression ')'           #listRemoveOperation
+    //| IDENTIFIER '.IndexOf' '(' expression ')'          #listIndexOfOperation
     ;
 
 structOperation
     : 'new Struct' IDENTIFIER IDENTIFIER                #structCreation
-    | IDENTIFIER '.' IDENTIFIER '=' expression          #structAssingment
-    | DEFINE 'struct' IDENTIFIER block                  #structDefinition
+    | IDENTIFIER ':' IDENTIFIER '=' expression          #structAssingment
+    | DEFINE 'Struct' IDENTIFIER block                  #structDefinition
     ;
     
 arrayOperation
     : 'new Array' IDENTIFIER '[' expression ']'                 #arrayCreation
-    | IDENTIFIER '[' expression ']' '.' IDENTIFIER              #arrayStructMemberAccess
+    | IDENTIFIER '[' expression ']' ':' IDENTIFIER              #arrayStructMemberAccess
     | IDENTIFIER '[' INTEGER ']' '=' expression                 #arrayAssingment
-    | IDENTIFIER '[' INTEGER ']' '.' IDENTIFIER '=' expression  #arrayStructMemberAccessAssingment
+    | IDENTIFIER '[' INTEGER ']' ':' IDENTIFIER '=' expression  #arrayStructMemberAccessAssingment
     ;
 
 returnStatement: 'return' expression;
@@ -45,18 +45,18 @@ functionDefinition: DEFINE IDENTIFIER block;
 
 functionCall: IDENTIFIER '(' (expression (',' expression)*)? ')';
 
+methodCall: IDENTIFIER '.' functionCall;
+
 DEFINE: 'def' | 'define';
 
 structMemberDefinition: IDENTIFIER;
-
-//arrayCreation: 'new Array' IDENTIFIER '[' expression ']';
 
 expression
     : constant                                              #constantExp
     | '$' INTEGER                                           #argumentIdentifierExp
     | returnStatement                                       #returnStatementExp
-    | IDENTIFIER '.' IDENTIFIER                             #structMemberAccessExp
-    //| IDENTIFIER '[' expression ']' '.' IDENTIFIER          #arrayStructMemberAccessExp
+    | IDENTIFIER ':' IDENTIFIER                             #structMemberAccessExp
+    | methodCall                                            #methodCallExp
     | IDENTIFIER '[' expression ']'                         #arrayAccessExp
     | IDENTIFIER                                            #identifierExp
     | functionCall                                          #functionCallExp
@@ -94,5 +94,3 @@ block: '{' line* '}';
 
 WS: [ \t\r\n]+ -> skip;
 IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
-
- 
