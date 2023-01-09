@@ -1,11 +1,5 @@
-if (OK(IsServerUp("gentoo.org"))) {
-	Write("OK!", GREEN);
-} else {
-	Write(ERROR, RED);
-}
-
-if (OK(IsServerUp("gentoo.org1", 1))) {
-	Write("OK!", GREEN);
-} else {
-	Write(ERROR, RED);
-}
+Write(4 % 2);
+Write(2+2);
+Write(3-2);
+Write(3/3);
+Write(3^3);

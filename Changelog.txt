@@ -1,4 +1,9 @@
 Changelog for version 1.0.x
+	- Improved the logic of doing math,
+	- Finally added modulo, division and power of,
+	- Added a new keyword `catapult` for catapulting exceptions
+	- Finally added comments,
+	- Changed a bit how if compares values,
 	- Added new network functionality
 	- Fixed a bug in whitch you could override standard functions,
 	- Fixed importing script files and libraries with `using`,

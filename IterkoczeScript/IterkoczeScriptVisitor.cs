@@ -1,5 +1,6 @@
 using Antlr4.Runtime.Misc;
 using IterkoczeScript.Content;
+using IterkoczeScript.Errors;
 using IterkoczeScript.Functions;
 
 namespace IterkoczeScript;
@@ -455,32 +456,19 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         return currentFunction.VARS[varName];
     }
 
-    public override object? VisitAddExp(IterkoczeScriptParser.AddExpContext context)
-    {
+    public override object? VisitMathExp(IterkoczeScriptParser.MathExpContext context) {
         var left = Visit(context.expression(0));
         var right = Visit(context.expression(1));
 
-        var op = context.addOp().GetText();
+        var op = context.mathOp().GetText();
 
-        return op switch
-        {
+        return op switch {
             "+" => IterkoczeMath.Add(left, right),
             "-" => IterkoczeMath.Subtract(left, right),
-            _ => throw new NotImplementedException()
-        };
-    }
-
-    public override object? VisitMulExp(IterkoczeScriptParser.MulExpContext context)
-    {
-        var left = Visit(context.expression(0));
-        var right = Visit(context.expression(1));
-
-        var op = context.mulOp().GetText();
-
-        return op switch
-        {
             "*" => IterkoczeMath.Multiply(left, right),
-            //"/" => Subtract(left, right),
+            "%" => IterkoczeMath.Modulo(left, right),
+            "/" => IterkoczeMath.Divide(left, right),
+            "^" => IterkoczeMath.PowerOf(left, right),
             _ => throw new NotImplementedException()
         };
     }
@@ -569,12 +557,25 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         };
     }
 
-    private bool IsTrue(object? value)
-    {
+    public override object VisitCatapult([NotNull] IterkoczeScriptParser.CatapultContext context) {
+        var exName = context.IDENTIFIER();
+
+        var oldColour = Console.ForegroundColor;
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.Write("[EXCEPTION CATAPULTED] " + exName + " from line " + context.start.Line);
+        Console.ForegroundColor = oldColour;
+
+        Environment.Exit(-1);
+        return -1;
+    }
+
+    private bool IsTrue(object? value) {
+        if (value is IError)
+            _ = new RuntimeError($"Tried to compare an error value. Possibly an unhandled error in an if block? {value}");
         if (value is bool b)
             return b;
 
-        new RuntimeError("Value is not boolean.");
+        _ = new RuntimeError($"{value} is not boolean.");
         return false;
     }
 

@@ -3,7 +3,9 @@ grammar IterkoczeScript;
 program: line* EOF;
 line: statement | ifBlock | forBlock | whileBlock | foreachBlock | functionDefinition | structOperation;
 
-statement: (useDirective | arrayOperation | assingment | listOperation | structMemberDefinition | structOperation | expression | functionCall | returnStatement) ';';
+statement: (catapult | useDirective | arrayOperation | assingment | listOperation 
+        | structMemberDefinition | structOperation | expression
+        | functionCall | returnStatement) ';';
 
 listOperation
     : 'new List' IDENTIFIER                             #listCreation
@@ -50,6 +52,8 @@ structMemberDefinition: IDENTIFIER;
 
 useDirective: ('@use' || '#use') IDENTIFIER;
 
+catapult: 'catapult' IDENTIFIER;
+
 expression
     : constant                                              #constantExp
     | '$' INTEGER                                           #argumentIdentifierExp
@@ -62,8 +66,7 @@ expression
     | functionDefinition                                    #functionDefinitionExp
     | '(' expression ')'                                    #parenthesizedExp
     | INVERT_OPERATOR expression                            #notExp
-    | expression mulOp expression                           #mulExp
-    | expression addOp expression                           #addExp
+    | expression mathOp expression                          #mathExp
     | expression compareOp expression                       #compareExp
     | expression booleanOp expression                       #booleanExp
     | listOperation                                         #listOperationExp
@@ -73,8 +76,7 @@ expression
     
 assingment: IDENTIFIER '=' expression;  
     
-mulOp: '*' | '/' | '%';
-addOp: '+' | '-';
+mathOp: '+' | '-' | '*' | '/' | '%' | '^';
 compareOp: '==' | '!=' | '>' | '<' | '>=' | '<=';
 booleanOp: BOOLEAN_OPERATOR;
 
@@ -93,3 +95,6 @@ block: '{' line* '}';
 
 WS: [ \t\r\n]+ -> skip;
 IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
+LINE_COMMENT
+    : '//' ~[\r\n]* -> skip
+;

@@ -2,4 +2,3 @@ Write(ArgumentCount()); //If we pass arguments to the Interpreter, like this: It
 
 Write(Argument(0));  //This function gets the first argument passed to the program. So this would be 'arg1'
 Write(Argument(1));  //And this 'arg2'
-// This will error out btw. You can't have comments in this language
