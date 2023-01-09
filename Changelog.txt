@@ -1,7 +1,12 @@
 Changelog for version 1.x.0
+	- Rewritten the variable system,
+	- Added constants,
+	- Added global variables with keyword `global`,
+	- Fixed a bug in whitch you coudn't assign new values to function arguments,
+	- Fixed the disappearing variables bug while calling a function, 
 	- Implemented missing `Execute` function,
 	- Fixed a bug in whitch you could make variables with the same name as predefined constants
-	- Added more utility functions (StartRuntimeTimer, StopRuntimeTimer, GetRuntime),
+	- Added more utility functions (StartRuntimeTimer, StopRuntimeTimer, GetRuntime, Linux),
 	- Improved the logic of doing math,
 	- Finally added modulo, division and power of,
 	- Added a new keyword `catapult` for catapulting exceptions

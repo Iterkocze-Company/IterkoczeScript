@@ -7,9 +7,10 @@ namespace IterkoczeScript;
 
 public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
     private bool ShouldEndLoop = false;
-    private Dictionary<string, object?> VARS { get; } = new();
-    public static Dictionary<string, object?> PREDEF_VARS { get; } = new();
-    //public static string ERROR = "NONE";
+    //private Dictionary<string, Variable> VARS { get; } = new();
+    public static Dictionary<string, Variable> PREDEF_VARS { get; } = new();
+    public static Dictionary<string, Variable> GLOBAL_VARS { get; } = new ();
+    //public static Dictionary<string, Variable> CONST_VARS { get; } = new();
     private Dictionary<string, object?> STANDARD_FUNCTIONS { get; } = new();
     private List<Function> FUNCTIONS { get; } = new();
     private static Function mainFunction = new("Main", null);
@@ -17,11 +18,11 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
 
     public IterkoczeScriptVisitor()
     {
-        PREDEF_VARS["PI"] = Math.PI;
-        PREDEF_VARS["RED"] = ConsoleColor.Red;
-        PREDEF_VARS["GREEN"] = ConsoleColor.Green;
-        PREDEF_VARS["BLUE"] = ConsoleColor.Blue;
-        PREDEF_VARS["ERROR"] = "NONE";
+        PREDEF_VARS["PI"] = new(Math.PI,true, true);
+        PREDEF_VARS["RED"] = new(ConsoleColor.Red,true,true);
+        PREDEF_VARS["GREEN"] = new(ConsoleColor.Green, true, true);
+        PREDEF_VARS["BLUE"] = new(ConsoleColor.Blue, true, true);
+        PREDEF_VARS["ERROR"] = new("NONE", true, true);
 
         // Utility
         STANDARD_FUNCTIONS["Argument"] = new Func<object?[], object?>(StandardFunctions.Argument);
@@ -60,14 +61,25 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
 
     public override object? VisitAssingment(IterkoczeScriptParser.AssingmentContext context) {
         var varName = context.IDENTIFIER().GetText();
+        bool isGlobal = context.start.Text.ToString() == "global" ? true : false;
+        bool isConst = context.start.Text.ToString() == "const" ? true : false;
         var value = Visit(context.expression());
 
-        if (PREDEF_VARS.ContainsKey(varName))
-            _ = new RuntimeError($"Predefined constant value {varName} can't be redefined", context);
+        if (GLOBAL_VARS.ContainsKey(varName))
+             GLOBAL_VARS[varName].Value = value;
 
-        currentFunction.VARS[varName] = value;
+        if (currentFunction.VARS.ContainsKey(varName)) {
+            if (currentFunction.VARS[varName].isConstant)
+                _ = new RuntimeError($"Can't write to a constant {varName}", context);
+             
+            currentFunction.VARS[varName].Value = value;
+            return null;
+        }
+        currentFunction.VARS.Add(varName, new(value, isGlobal, isConst));
+        if (currentFunction.VARS[varName].isGlobal)
+            GLOBAL_VARS.Add(varName, currentFunction.VARS[varName]);
 
-        return currentFunction.VARS[varName];
+        return null;
     }
 
     public override object? VisitArrayAssingment(IterkoczeScriptParser.ArrayAssingmentContext context) {
@@ -147,7 +159,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         int adder = int.Parse(context.INTEGER().GetText());
         var op = context.GetText();
 
-        currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = indexer;
+        currentFunction.VARS[context.assingment().IDENTIFIER().ToString()].Value = indexer;
         
         if (op.Contains(">=")) 
             goto GreaterThanOrEqual;
@@ -162,7 +174,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         for (int i = indexer; i < (int)condition; i += adder) {
             if (ShouldEndLoop) goto End;
             VisitBlock(context.block());
-            currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+adder;
+            currentFunction.VARS[context.assingment().IDENTIFIER().ToString()].Value = Convert.ToInt32(indexer)+adder;
             indexer += adder;
         }
         goto End;
@@ -170,7 +182,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         for (int i = indexer; i > (int)condition; i += adder) {
             if (ShouldEndLoop) goto End;
             VisitBlock(context.block());
-            currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+adder;
+            currentFunction.VARS[context.assingment().IDENTIFIER().ToString()].Value = Convert.ToInt32(indexer)+adder;
             indexer += adder;
         }
         goto End;
@@ -178,7 +190,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         for (int i = indexer; i >= (int)condition; i += adder) {
             if (ShouldEndLoop) goto End;
             VisitBlock(context.block());
-            currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+adder;
+            currentFunction.VARS[context.assingment().IDENTIFIER().ToString()].Value = Convert.ToInt32(indexer)+adder;
             indexer += adder;
         }
         goto End;
@@ -186,7 +198,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         for (int i = indexer; i <= (int)condition; i += adder) {
             if (ShouldEndLoop) goto End;
             VisitBlock(context.block());
-            currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+adder;
+            currentFunction.VARS[context.assingment().IDENTIFIER().ToString()].Value = Convert.ToInt32(indexer)+adder;
             indexer += adder;
         }
         End:
@@ -243,15 +255,12 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
                 goto Continue;
         }
 
-        new RuntimeError($"Struct {structTarget} does not exist but was attempted to be instancieted!", context);
+        _ = new RuntimeError($"Struct {structTarget} does not exist but was attempted to be instancieted!", context);
         
         Continue:
-        foreach (Struct st in currentFunction.Structs)
-        {
-            try
-            {
-                if (st.Name == structTarget)
-                {
+        foreach (Struct st in currentFunction.Structs) {
+            try {
+                if (st.Name == structTarget) {
                     var dic = new Dictionary<string, object?>();
                     foreach (var VAR in st.Variables)
                         dic.Add(VAR.Key, null);
@@ -259,8 +268,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
                     currentFunction.StructInstances.Add(structInstanceName, new Struct(st.Name, dic));
                 }
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 new RuntimeError($"The struct {st.Name} has been defined more than once or has more than one instance of the same name!", context);
             }
         }
@@ -325,7 +333,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
             {
                 foreach (var VARIABLE2 in (List<object?>)target)
                 {
-                    currentFunction.VARS[variable] = VARIABLE2;
+                    currentFunction.VARS[variable].Value = VARIABLE2;
                     Visit(context.block());
                 }
                 currentFunction.VARS.Remove(variable);
@@ -338,7 +346,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
 
         foreach (var v in target.ToString())
         {
-            currentFunction.VARS[variable] = v;
+            currentFunction.VARS[variable].Value = v;
             Visit(context.block());
         }
 
@@ -371,7 +379,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         }
         catch (Exception ex) { subjectName = null; }
         var args = context.expression().Select(Visit).ToArray();
-        Dictionary<string, object?> OLDVARS;
+        Dictionary<string, Variable> OLDVARS;
         foreach (Function function in FUNCTIONS) {
             if (function.Name == name) {
                 OLDVARS = currentFunction.VARS;
@@ -414,7 +422,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         if (STANDARD_FUNCTIONS.ContainsKey(name))
             _ = new RuntimeError($"Function {name} is a standard function, but an attempt was made to override it", context);
         
-        if (VARS.ContainsKey(name))
+        if (currentFunction.VARS.ContainsKey(name))
             _ = new RuntimeError($"Function {name} was already defined!", context);
         
         FUNCTIONS.Add(new Function(name, code));
@@ -422,47 +430,52 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         return null;
     }
 
-    public override object? VisitArgumentIdentifierExp(IterkoczeScriptParser.ArgumentIdentifierExpContext context)
-    {
+    public override object? VisitArgumentIdentifierExp(IterkoczeScriptParser.ArgumentIdentifierExpContext context) {
         return currentFunction.args[int.Parse(context.INTEGER().GetText())];
     }
 
-    public override object? VisitIdentifierExp(IterkoczeScriptParser.IdentifierExpContext context)
-    {
+    public override object VisitArgumentAssingmentExp([NotNull] IterkoczeScriptParser.ArgumentAssingmentExpContext context) {
+        var val = Visit(context.expression());
+        currentFunction.args[int.Parse(context.INTEGER().GetText())] = val;
+        return null;
+    }
+
+    public override object? VisitIdentifierExp(IterkoczeScriptParser.IdentifierExpContext context) {
         var varName = context.IDENTIFIER().GetText();
         
-        foreach (var VAR in PREDEF_VARS)
-        {
+        foreach (var VAR in PREDEF_VARS) {
             if (VAR.Key == varName)
                 return PREDEF_VARS[varName];
         }
         
-        foreach (var st in currentFunction.Structs)
-        {
-            if (st.Name == varName)
-            {
+        foreach (var st in currentFunction.Structs) {
+            if (st.Name == varName) {
                 return st.Name;
             }
         }
         
-        foreach (var st in currentFunction.StructInstances)
-        {
+        foreach (var st in currentFunction.StructInstances) {
             if (st.Key == varName)
                 return currentFunction.StructInstances[varName];
         }
         
-        foreach (var list in currentFunction.Lists)
-        {
+        foreach (var list in currentFunction.Lists) {
             if (list.Key == varName)
                 return currentFunction.Lists[varName];
         }
 
-        if (!currentFunction.VARS.ContainsKey(varName))
-        {
-            new RuntimeError($"Variable {varName} is not defined!", context);
+        if (!currentFunction.VARS.ContainsKey(varName)
+            && !GLOBAL_VARS.ContainsKey(varName)) {
+            _ = new RuntimeError($"Variable {varName} is not defined!", context);
         }
 
-        return currentFunction.VARS[varName];
+        if (GLOBAL_VARS.ContainsKey(varName))
+            return GLOBAL_VARS[varName].Value;
+
+        if (currentFunction.VARS.ContainsKey(varName))
+            return currentFunction.VARS[varName].Value;
+
+        return null;
     }
 
     public override object? VisitMathExp(IterkoczeScriptParser.MathExpContext context) {

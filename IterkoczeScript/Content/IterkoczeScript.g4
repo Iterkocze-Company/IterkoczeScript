@@ -57,6 +57,7 @@ catapult: 'catapult' IDENTIFIER;
 expression
     : constant                                              #constantExp
     | '$' INTEGER                                           #argumentIdentifierExp
+    | '$' INTEGER '=' expression                            #argumentAssingmentExp
     | returnStatement                                       #returnStatementExp
     | IDENTIFIER ':' IDENTIFIER                             #structMemberAccessExp
     | methodCall                                            #methodCallExp
@@ -74,7 +75,7 @@ expression
     | 'crack'                                               #crackLoopExp
     ;
     
-assingment: IDENTIFIER '=' expression;  
+assingment: ('global' || 'const')? IDENTIFIER '=' expression;  
     
 mathOp: '+' | '-' | '*' | '/' | '%' | '^';
 compareOp: '==' | '!=' | '>' | '<' | '>=' | '<=';

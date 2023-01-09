@@ -1,5 +1,13 @@
-if (Linux()) {
-	Write("You are on Linux! No need to thank me for that info. I bet you didn't know");
-} else {
-	Write("You are not on Linux");
+global sos = 10;
+const feet = "feet";
+
+def kek {
+	sos = sos + 1;
+	return sos;
 }
+
+Write(sos);
+sos = kek();
+Write(sos);
+Write(feet);
+feet = "";
