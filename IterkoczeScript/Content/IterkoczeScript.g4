@@ -48,7 +48,7 @@ methodCall: IDENTIFIER '.' functionCall;
 
 DEFINE: 'def' | 'define';
 
-structMemberDefinition: IDENTIFIER;
+structMemberDefinition: 'member' IDENTIFIER;
 
 useDirective: ('@use' || '#use') IDENTIFIER;
 

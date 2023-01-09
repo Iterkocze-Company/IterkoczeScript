@@ -1,13 +1,14 @@
-global sos = 10;
-const feet = "feet";
-
-def kek {
-	sos = sos + 1;
-	return sos;
+def Struct Person {
+    member Name;
+    member Age;
 }
 
-Write(sos);
-sos = kek();
-Write(sos);
-Write(feet);
-feet = "";
+new Struct Person P1;
+
+P1:Name = "John";
+P1:Age = 18;
+
+foreach (p in Person) {
+    Write(p:Name);
+    Write(p:Age);
+}

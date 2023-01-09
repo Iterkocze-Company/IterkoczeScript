@@ -73,13 +73,13 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
                 _ = new RuntimeError($"Can't write to a constant {varName}", context);
              
             currentFunction.VARS[varName].Value = value;
-            return null;
+            return currentFunction.VARS[varName].Value;
         }
         currentFunction.VARS.Add(varName, new(value, isGlobal, isConst));
         if (currentFunction.VARS[varName].isGlobal)
             GLOBAL_VARS.Add(varName, currentFunction.VARS[varName]);
 
-        return null;
+        return currentFunction.VARS[varName].Value;
     }
 
     public override object? VisitArrayAssingment(IterkoczeScriptParser.ArrayAssingmentContext context) {
