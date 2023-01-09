@@ -1,5 +1,6 @@
 using Antlr4.Runtime.Misc;
 using IterkoczeScript.Content;
+using IterkoczeScript.Functions;
 
 namespace IterkoczeScript;
 
@@ -21,9 +22,11 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         PREDEF_VARS["BLUE"] = ConsoleColor.Blue;
         PREDEF_VARS["ERROR"] = "NONE";
 
+        // MISC
         STANDARD_FUNCTIONS["Argument"] = new Func<object?[], object?>(StandardFunctions.Argument);
         STANDARD_FUNCTIONS["ArgumentCount"] = new Func<object?[], object?>(StandardFunctions.ArgumentCount);
 
+        // BASIC
         STANDARD_FUNCTIONS["Write"] = new Func<object?[], object?>(StandardFunctions.Write);
         STANDARD_FUNCTIONS["WriteToFile"] = new Func<object?[], object?>(StandardFunctions.WriteToFile);
         STANDARD_FUNCTIONS["ReadFromFile"] = new Func<object?[], object?>(StandardFunctions.ReadFromFile);
@@ -32,11 +35,15 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         STANDARD_FUNCTIONS["Exit"] = new Func<object?[], object?>(StandardFunctions.Exit);
         STANDARD_FUNCTIONS["GetChar"] = new Func<object?[], object?>(StandardFunctions.GetChar);
         
+        // CONVERTION
         STANDARD_FUNCTIONS["ConvertToInt"] = new Func<object?[], object?>(StandardFunctions.ConvertToInt);
         STANDARD_FUNCTIONS["ConvertToString"] = new Func<object?[], object?>(StandardFunctions.ConvertToString);
 
+        // ERROR HANDLING
         STANDARD_FUNCTIONS["OK"] = new Func<object?[], object?>(StandardFunctions.OK);
 
+        // NETWORK
+        STANDARD_FUNCTIONS["IsServerUp"] = new Func<object?[], object?>(Network.IsServerUp);
     }
 
     public override object? VisitListCreation(IterkoczeScriptParser.ListCreationContext context) {
@@ -62,7 +69,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
             currentFunction.Arrays[arrayName].SetValue(value, int.Parse(index));
         }
         catch {
-           _ = new Error($"Index {index} was out of bounds for array {arrayName} of size {Utility.GetRealArrayLenght(currentFunction.Arrays[arrayName])}.", context);
+           _ = new RuntimeError($"Index {index} was out of bounds for array {arrayName} of size {Utility.GetRealArrayLenght(currentFunction.Arrays[arrayName])}.", context);
         }
         return null;
     }
@@ -71,7 +78,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         var arrayName = context.IDENTIFIER().GetText();
         var arraySize = 0;
         if (context.expression() == null) {
-           _ = new Error($"Array \"{arrayName}\" has no size at declaration.", context);
+           _ = new RuntimeError($"Array \"{arrayName}\" has no size at declaration.", context);
         }
         arraySize = (int)Visit(context.expression());
         currentFunction.Arrays[arrayName] = new object?[(int)arraySize];
@@ -88,13 +95,13 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
                 return currentFunction.Arrays[arrayName].GetValue((int)index);
             }
             catch {
-                _ = new Error($"Index {index} was out of bounds for array {arrayName} of size {Utility.GetRealArrayLenght(currentFunction.Arrays[arrayName])}.", context);
+                _ = new RuntimeError($"Index {index} was out of bounds for array {arrayName} of size {Utility.GetRealArrayLenght(currentFunction.Arrays[arrayName])}.", context);
             }
         }
         foreach (var VARIABLE in currentFunction.Lists) { //If it's a List
             if (VARIABLE.Key == arrayName) {
                 if (currentFunction.Lists[arrayName].Count <= (int)index) {
-                   _ = new Error($"Index {index} was out of bounds in the List {arrayName}!");
+                   _ = new RuntimeError($"Index {index} was out of bounds in the List {arrayName}!");
                 }
                 return currentFunction.Lists[arrayName][(int)index];
             }
@@ -226,7 +233,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
                 goto Continue;
         }
 
-        new Error($"Struct {structTarget} does not exist but was attempted to be instancieted!", context);
+        new RuntimeError($"Struct {structTarget} does not exist but was attempted to be instancieted!", context);
         
         Continue:
         foreach (Struct st in currentFunction.Structs)
@@ -244,7 +251,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
             }
             catch (Exception e)
             {
-                new Error($"The struct {st.Name} has been defined more than once or has more than one instance of the same name!", context);
+                new RuntimeError($"The struct {st.Name} has been defined more than once or has more than one instance of the same name!", context);
             }
         }
         return null;
@@ -267,10 +274,10 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         var varName = context.IDENTIFIER(1).GetText();
         
         if (!currentFunction.StructInstances.ContainsKey(structInstanceName))
-            new Error($"struct instance {structInstanceName} does not exist!", context);
+            new RuntimeError($"struct instance {structInstanceName} does not exist!", context);
 
         if (!currentFunction.StructInstances[structInstanceName].Variables.ContainsKey(varName))
-            new Error($"The struct variable {varName} does not exist in struct {structInstanceName}!", context);
+            new RuntimeError($"The struct variable {varName} does not exist in struct {structInstanceName}!", context);
         
         return currentFunction.StructInstances[structInstanceName].Variables[varName];
     }
@@ -375,7 +382,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         }
         
         if (!STANDARD_FUNCTIONS.ContainsKey(name))
-            new Error($"Function {name} is not defined!", context);
+            new RuntimeError($"Function {name} is not defined!", context);
 
         if (STANDARD_FUNCTIONS[name] is not Func<object?[], object?> func)
             throw new Exception($"variable {name} is not a function.");
@@ -383,21 +390,22 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         return func(args);
     }
 
-    public override object? VisitReturnStatement(IterkoczeScriptParser.ReturnStatementContext context)
-    { 
+    public override object? VisitReturnStatement(IterkoczeScriptParser.ReturnStatementContext context) { 
         //TODO: It's good for now...?
         if (currentFunction.ReturnValue == null)
             currentFunction.ReturnValue = Visit(context.expression());
         return null;
     }
 
-    public override object? VisitFunctionDefinition(IterkoczeScriptParser.FunctionDefinitionContext context)
-    {
+    public override object? VisitFunctionDefinition(IterkoczeScriptParser.FunctionDefinitionContext context) {
         var name = context.IDENTIFIER().GetText();
         var code = context.block();
+
+        if (STANDARD_FUNCTIONS.ContainsKey(name))
+            _ = new RuntimeError($"Function {name} is a standard function, but an attempt was made to override it", context);
         
         if (VARS.ContainsKey(name))
-            new Error($"Function {name} was already defined!", context);
+            _ = new RuntimeError($"Function {name} was already defined!", context);
         
         FUNCTIONS.Add(new Function(name, code));
 
@@ -441,7 +449,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
 
         if (!currentFunction.VARS.ContainsKey(varName))
         {
-            new Error($"Variable {varName} is not defined!", context);
+            new RuntimeError($"Variable {varName} is not defined!", context);
         }
 
         return currentFunction.VARS[varName];
@@ -566,7 +574,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         if (value is bool b)
             return b;
 
-        new Error("Value is not boolean.");
+        new RuntimeError("Value is not boolean.");
         return false;
     }
 

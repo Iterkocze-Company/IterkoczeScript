@@ -16,7 +16,7 @@ public static class Compare
         if (left is float lFloat && right is int rInt)
             return lFloat > rInt;
 
-        new Error($"Cannot compare values of types {left.GetType()} and {right.GetType()}");
+        new RuntimeError($"Cannot compare values of types {left.GetType()} and {right.GetType()}");
         return false;
     }
     public static bool LessThan(object? left, object? right)
@@ -33,7 +33,7 @@ public static class Compare
         if (left is float lFloat && right is int rInt)
             return lFloat < rInt;
 
-        new Error($"Cannot compare values of types {left.GetType()} and {right.GetType()}");
+        new RuntimeError($"Cannot compare values of types {left.GetType()} and {right.GetType()}");
         return false;
     }
     public static bool LessOrEqual(object? left, object? right)
@@ -50,7 +50,7 @@ public static class Compare
         if (left is float lFloat && right is int rInt)
             return lFloat <= rInt;
 
-        new Error($"Cannot compare values of types {left.GetType()} and {right.GetType()}");
+        new RuntimeError($"Cannot compare values of types {left.GetType()} and {right.GetType()}");
         return false;
     }
     public static bool IsEqual(object? left, object? right)
@@ -76,7 +76,7 @@ public static class Compare
             return !false; //ICANT
         }
 
-        new Error($"Cannot compare values of types {left.GetType()} and {right.GetType()}");
+        new RuntimeError($"Cannot compare values of types {left.GetType()} and {right.GetType()}");
         return false;
     }
     public static bool IsNotEqual(object? left, object? right)
@@ -99,7 +99,7 @@ public static class Compare
             return false;
         }
 
-        new Error($"Cannot compare values of types {left.GetType()} and {right.GetType()}");
+        new RuntimeError($"Cannot compare values of types {left.GetType()} and {right.GetType()}");
         return false;
     }
 }

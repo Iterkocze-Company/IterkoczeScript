@@ -15,7 +15,7 @@ public static class IterkoczeBoolean
         if (left is bool lBool && right is bool rBool)
             return lBool && rBool;
 
-        new Error($"Cannot compare values of types {left.GetType()} and {right.GetType()}");
+        new RuntimeError($"Cannot compare values of types {left.GetType()} and {right.GetType()}");
         return false;
     }
     public static bool Or(object? left, object? right)
@@ -23,7 +23,7 @@ public static class IterkoczeBoolean
         if (left is bool lBool && right is bool rBool)
             return lBool || rBool;
 
-        new Error($"Cannot compare values of types {left.GetType()} and {right.GetType()}");
+        new RuntimeError($"Cannot compare values of types {left.GetType()} and {right.GetType()}");
         return false;
     }
     public static bool Not(object? exp)
@@ -31,7 +31,7 @@ public static class IterkoczeBoolean
         if (exp is bool lBool)
             return !(lBool);
 
-        new Error($"You can't invert non-booleans with `not`, but tried to invert type {exp.GetType()}");
+        new RuntimeError($"You can't invert non-booleans with `not`, but tried to invert type {exp.GetType()}");
         return false;
     }
 }

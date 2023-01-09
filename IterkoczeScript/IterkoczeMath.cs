@@ -16,7 +16,7 @@ public static class IterkoczeMath
         if (left is string || right is string)
             return $"{left}{right}";
 
-        new Error($"Cannot add value of type {left.GetType()} to {right.GetType()}");
+        new RuntimeError($"Cannot add value of type {left.GetType()} to {right.GetType()}");
         return false;
     }
     public static object? Subtract(object? left, object? right)
@@ -30,7 +30,7 @@ public static class IterkoczeMath
         if (left is float lFloat && right is int rInt)
             return lFloat - rInt;
         
-        new Error($"Cannot subtract value of type {left.GetType()} to {right.GetType()}");
+        new RuntimeError($"Cannot subtract value of type {left.GetType()} to {right.GetType()}");
         return false;
     }
     public static object? Multiply(object? left, object? right)
@@ -44,7 +44,7 @@ public static class IterkoczeMath
         if (left is float lFloat && right is int rInt)
             return lFloat * rInt;
         
-        new Error($"Cannot multiply value of type {left.GetType()} with {right.GetType()}");
+        new RuntimeError($"Cannot multiply value of type {left.GetType()} with {right.GetType()}");
         return false;
     }
 }

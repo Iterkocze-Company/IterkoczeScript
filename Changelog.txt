@@ -1,4 +1,6 @@
 Changelog for version 1.0.x
+	- Added new network functionality
+	- Fixed a bug in whitch you could override standard functions,
 	- Fixed importing script files and libraries with `using`,
 	- Updated libraries
 

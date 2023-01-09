@@ -6,7 +6,7 @@ public static class Program {
     public static string[]? ProgramArgs;
     public static void Main(string[] args) {
         if (args.Length == 0) {
-            _ = new Error("You need to provide a valid path for a script file.");
+            _ = new RuntimeError("You need to provide a valid path for a script file.");
         }
         if (args.Contains("-v")) {
             Console.WriteLine("Iterkocze IterkoczeScriptInterpreter 1.0.2");
