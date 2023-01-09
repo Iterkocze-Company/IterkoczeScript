@@ -23,9 +23,18 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         PREDEF_VARS["BLUE"] = ConsoleColor.Blue;
         PREDEF_VARS["ERROR"] = "NONE";
 
-        // MISC
+        // Utility
         STANDARD_FUNCTIONS["Argument"] = new Func<object?[], object?>(StandardFunctions.Argument);
         STANDARD_FUNCTIONS["ArgumentCount"] = new Func<object?[], object?>(StandardFunctions.ArgumentCount);
+        STANDARD_FUNCTIONS["Exit"] = new Func<object?[], object?>(StandardFunctions.Exit);
+        STANDARD_FUNCTIONS["OK"] = new Func<object?[], object?>(StandardFunctions.OK);
+        STANDARD_FUNCTIONS["StartRuntimeTimer"] = new Func<object?[], object?>(StandardFunctions.StartRuntimeTimer);
+        STANDARD_FUNCTIONS["StopRuntimeTimer"] = new Func<object?[], object?>(StandardFunctions.StopRuntimeTimer);
+        STANDARD_FUNCTIONS["GetRuntime"] = new Func<object?[], object?>(StandardFunctions.GetRuntime);
+        STANDARD_FUNCTIONS["Execute"] = new Func<object?[], object?>(StandardFunctions.Execute);
+        STANDARD_FUNCTIONS["Linux"] = new Func<object?[], object?>(StandardFunctions.Linux);
+
+
 
         // BASIC
         STANDARD_FUNCTIONS["Write"] = new Func<object?[], object?>(StandardFunctions.Write);
@@ -33,15 +42,11 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         STANDARD_FUNCTIONS["ReadFromFile"] = new Func<object?[], object?>(StandardFunctions.ReadFromFile);
         STANDARD_FUNCTIONS["Read"] = new Func<object?[], object?>(StandardFunctions.Read);
         STANDARD_FUNCTIONS["ReadAsInt"] = new Func<object?[], object?>(StandardFunctions.ReadAsInt);
-        STANDARD_FUNCTIONS["Exit"] = new Func<object?[], object?>(StandardFunctions.Exit);
         STANDARD_FUNCTIONS["GetChar"] = new Func<object?[], object?>(StandardFunctions.GetChar);
         
         // CONVERTION
         STANDARD_FUNCTIONS["ConvertToInt"] = new Func<object?[], object?>(StandardFunctions.ConvertToInt);
         STANDARD_FUNCTIONS["ConvertToString"] = new Func<object?[], object?>(StandardFunctions.ConvertToString);
-
-        // ERROR HANDLING
-        STANDARD_FUNCTIONS["OK"] = new Func<object?[], object?>(StandardFunctions.OK);
 
         // NETWORK
         STANDARD_FUNCTIONS["IsServerUp"] = new Func<object?[], object?>(Network.IsServerUp);
@@ -56,6 +61,10 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
     public override object? VisitAssingment(IterkoczeScriptParser.AssingmentContext context) {
         var varName = context.IDENTIFIER().GetText();
         var value = Visit(context.expression());
+
+        if (PREDEF_VARS.ContainsKey(varName))
+            _ = new RuntimeError($"Predefined constant value {varName} can't be redefined", context);
+
         currentFunction.VARS[varName] = value;
 
         return currentFunction.VARS[varName];

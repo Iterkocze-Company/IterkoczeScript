@@ -1,4 +1,7 @@
-Changelog for version 1.0.x
+Changelog for version 1.x.0
+	- Implemented missing `Execute` function,
+	- Fixed a bug in whitch you could make variables with the same name as predefined constants
+	- Added more utility functions (StartRuntimeTimer, StopRuntimeTimer, GetRuntime),
 	- Improved the logic of doing math,
 	- Finally added modulo, division and power of,
 	- Added a new keyword `catapult` for catapulting exceptions

@@ -1,0 +1,10 @@
+// It will take about 0.5 seconds to run :)
+
+StartRuntimeTimer();
+
+for (i = 0; i <= 1000; 1) {
+    Write(i);
+}
+
+Write(GetRuntime());
+StopRuntimeTimer();
