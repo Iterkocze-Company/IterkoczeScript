@@ -1,5 +1,4 @@
-def Struct Person
-{
+def Struct Person {
     Name;
     Age;
 }
@@ -7,14 +6,13 @@ def Struct Person
 new Struct Person P1;
 new Struct Person P2;
 
-P1.Name = "John";
-P1.Age = 18;
+P1:Name = "John";
+P1:Age = 18;
 
-P2.Name = "James";
-P2.Age = 22;
+P2:Name = "James";
+P2:Age = 22;
 
-foreach (p in Person)
-{
+foreach (p in Person) {
     Write(p:Name);
     Write(p:Age);
 }

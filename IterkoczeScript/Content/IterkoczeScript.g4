@@ -7,9 +7,6 @@ statement: (arrayOperation | assingment | listOperation | structMemberDefinition
 
 listOperation
     : 'new List' IDENTIFIER                             #listCreation
-    //| IDENTIFIER '.Add' '(' expression ')'              #listAddOperation
-    //| IDENTIFIER '.Remove' '(' expression ')'           #listRemoveOperation
-    //| IDENTIFIER '.IndexOf' '(' expression ')'          #listIndexOfOperation
     ;
 
 structOperation
@@ -69,10 +66,10 @@ expression
     | expression booleanOp expression                       #booleanExp
     | listOperation                                         #listOperationExp
     | arrayOperation                                        #arrayOperationExp
+    | 'crack'                                               #crackLoopExp
     ;
     
 assingment: IDENTIFIER '=' expression;  
-//arrayAssingment: IDENTIFIER '[' INTEGER ']' '=' expression;
     
 mulOp: '*' | '/' | '%';
 addOp: '+' | '-';

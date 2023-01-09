@@ -1,3 +1,10 @@
+Changelog for version 1.0.2
+	- New error system,
+	- Updated some examples,
+	- Added a new keyword `crack` for stopping for loops and foreach loops,
+	- Better syntax errors
+	- Reworked the rework of calling methods,
+
 Changelog for version 1.0.1
 	- Reworked method calling and struct member access,
 	- Struct access changed from `.` to `:`,

@@ -4,8 +4,10 @@ using IterkoczeScript.Content;
 namespace IterkoczeScript;
 
 public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
+    private bool ShouldEndLoop = false;
     private Dictionary<string, object?> VARS { get; } = new();
-    private Dictionary<string, object?> PREDEF_VARS { get; } = new();
+    public static Dictionary<string, object?> PREDEF_VARS { get; } = new();
+    //public static string ERROR = "NONE";
     private Dictionary<string, object?> STANDARD_FUNCTIONS { get; } = new();
     private List<Function> FUNCTIONS { get; } = new();
     private static Function mainFunction = new("Main", null);
@@ -17,8 +19,8 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         PREDEF_VARS["RED"] = ConsoleColor.Red;
         PREDEF_VARS["GREEN"] = ConsoleColor.Green;
         PREDEF_VARS["BLUE"] = ConsoleColor.Blue;
-        PREDEF_VARS["ERROR"] = "ERROR";
-        
+        PREDEF_VARS["ERROR"] = "NONE";
+
         STANDARD_FUNCTIONS["Argument"] = new Func<object?[], object?>(StandardFunctions.Argument);
         STANDARD_FUNCTIONS["ArgumentCount"] = new Func<object?[], object?>(StandardFunctions.ArgumentCount);
 
@@ -32,23 +34,16 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         
         STANDARD_FUNCTIONS["ConvertToInt"] = new Func<object?[], object?>(StandardFunctions.ConvertToInt);
         STANDARD_FUNCTIONS["ConvertToString"] = new Func<object?[], object?>(StandardFunctions.ConvertToString);
+
+        STANDARD_FUNCTIONS["OK"] = new Func<object?[], object?>(StandardFunctions.OK);
+
     }
-    
+
     public override object? VisitListCreation(IterkoczeScriptParser.ListCreationContext context) {
         var listName = context.IDENTIFIER().GetText();
         currentFunction.Lists[listName] = new List<object?>();
         return null;
     }
-
-    /*public override object? VisitListIndexOfOperation(IterkoczeScriptParser.ListIndexOfOperationContext context) {
-        var listName = context.IDENTIFIER().GetText();
-        var value = Visit(context.expression());
-        if (currentFunction.Lists.ContainsKey(listName))
-            return currentFunction.Lists[listName].IndexOf(value);
-        else
-           _ = new Error($"List {listName} does not exist, but you tried to invoke `IndexOf`", context);
-        return null;
-    }*/
 
     public override object? VisitAssingment(IterkoczeScriptParser.AssingmentContext context) {
         var varName = context.IDENTIFIER().GetText();
@@ -148,6 +143,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         
         LessThan:
         for (int i = indexer; i < (int)condition; i += adder) {
+            if (ShouldEndLoop) goto End;
             VisitBlock(context.block());
             currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+adder;
             indexer += adder;
@@ -155,6 +151,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         goto End;
         GreaterThan:
         for (int i = indexer; i > (int)condition; i += adder) {
+            if (ShouldEndLoop) goto End;
             VisitBlock(context.block());
             currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+adder;
             indexer += adder;
@@ -162,6 +159,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         goto End;
         GreaterThanOrEqual:
         for (int i = indexer; i >= (int)condition; i += adder) {
+            if (ShouldEndLoop) goto End;
             VisitBlock(context.block());
             currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+adder;
             indexer += adder;
@@ -169,13 +167,21 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         goto End;
         LessThanOrEqual:
         for (int i = indexer; i <= (int)condition; i += adder) {
+            if (ShouldEndLoop) goto End;
             VisitBlock(context.block());
             currentFunction.VARS[context.assingment().IDENTIFIER().ToString()] = Convert.ToInt32(indexer)+adder;
             indexer += adder;
         }
         End:
         currentFunction.VARS.Remove(context.assingment().IDENTIFIER().ToString());
+        ShouldEndLoop = false;
         return null;
+    }
+
+    public override object VisitCrackLoopExp([NotNull] IterkoczeScriptParser.CrackLoopExpContext context)
+    {
+        ShouldEndLoop = true;
+        return base.VisitCrackLoopExp(context);
     }
 
     public override object? VisitBlock(IterkoczeScriptParser.BlockContext context) {
@@ -274,24 +280,24 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         var variable = context.IDENTIFIER().GetText();
         var target = Visit(context.expression());
 
-        foreach (var st in currentFunction.Structs)
-        {
-            if (st.Name == target)
-            {
+        foreach (var st in currentFunction.Structs) {
+            if (st.Name == target) {
                 string[] Names = new string[currentFunction.StructInstances.Count];
                 int index = 0;
-                foreach (var name in currentFunction.StructInstances)
-                {
+                foreach (var name in currentFunction.StructInstances) {
                     Names[index] = name.Key;
                     index++;
                 }
                 
-                for (int i = 0; i < currentFunction.StructInstances.Count; i++)
-                {
+                // Do foreach on a struct
+                for (int i = 0; i < currentFunction.StructInstances.Count; i++) {
                     currentFunction.StructInstances.Add(variable, new Struct(variable, currentFunction.StructInstances[Names[i]].Variables));
                     VisitBlock(context.block());
+                    if (ShouldEndLoop) break;
                     currentFunction.StructInstances.Remove(variable);
                 }
+                ShouldEndLoop = false;
+                currentFunction.StructInstances.Remove(variable);
                 return null;
             }
         }
@@ -330,12 +336,10 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
                 : IsFalse
             ;
 
-        if(condition(Visit(context.expression())))
-        { 
+        if(condition(Visit(context.expression()))) { 
             Visit(context.block());
         }
-        else if (context.elseIfBlock() != null)
-        {
+        else if (context.elseIfBlock() != null) {
             Visit(context.elseIfBlock());
         }
         
@@ -350,29 +354,24 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         }
         catch (Exception ex) { subjectName = null; }
         var args = context.expression().Select(Visit).ToArray();
+        Dictionary<string, object?> OLDVARS;
         foreach (Function function in FUNCTIONS) {
             if (function.Name == name) {
+                OLDVARS = currentFunction.VARS;
                 function.args = args;
                 currentFunction.args = args;
                 currentFunction = function;
                 VisitBlock(function.Code);
-                currentFunction.VARS = VARS;
+                //currentFunction.VARS = VARS;
+                currentFunction.VARS = OLDVARS;
+
                 return function.ReturnValue;
             }
         }
 
         if (subjectName != null) {
-            if (name == "Add" && currentFunction.Lists.ContainsKey(subjectName)) {
-                ListOperations.Add(currentFunction.Lists[subjectName], args[0]);
-                return 0;
-            }
-            if (name == "Remove" && currentFunction.Lists.ContainsKey(subjectName)) {
-                ListOperations.Remove(currentFunction.Lists[subjectName], args[0]);
-                return 0;
-            }
-            if (name == "IndexOf" && currentFunction.Lists.ContainsKey(subjectName)) {
-                return ListOperations.IndefOf(currentFunction.Lists[subjectName], args[0]);
-            }
+            if (currentFunction.Lists.ContainsKey(subjectName)) // If it's a List
+                return ListOperations.Invoke(currentFunction.Lists[subjectName], args[0], context.start.Text);
         }
         
         if (!STANDARD_FUNCTIONS.ContainsKey(name))

@@ -1,3 +1,4 @@
+using IterkoczeScript.Errors;
 using System.Media;
 
 namespace IterkoczeScript;
@@ -44,7 +45,7 @@ public class StandardFunctions
     public static object? WriteToFile(object?[] args)
     {
         if (args.Length != 2)
-            new Error("Function \"WriteToFile\" expects 2 arguments.");
+            _ = new Error("Function \"WriteToFile\" expects 2 arguments.");
         File.WriteAllText(args[0].ToString(), args[1].ToString());
 
         return args[1];
@@ -90,11 +91,15 @@ public class StandardFunctions
         return null;
     }
     // Arguments
-    public static object? Argument(object?[] args)
-    {
+    public static object? Argument(object?[] args) {
         if (args.Length != 1)
             new Error("Function \"Argument\" expects 1 argument.");
 
+        if (Program.ProgramArgs.Length <= (int)args[0]) {
+            IError err = new ErrorConversionFailed();
+            err.SetError();
+            return err;
+        }
         return Program.ProgramArgs[(int)args[0]];
     }
     public static object? ArgumentCount(object?[] args)
@@ -105,25 +110,26 @@ public class StandardFunctions
         return Program.ProgramArgs.Length;
     }
     //Convert Functions
-    public static object? ConvertToInt(object?[] args)
-    {
+    public static object? ConvertToInt(object?[] args) {
         if (args.Length != 1)
             new Error("Function \"ConvertToInt\" expects 1 argument.");
 
-        if (!int.TryParse(args[0].ToString(), out int output))
-        {
-            //new Error($"ConvertToInt: Can't convert {args[0].GetType()} to int");
-            return "ERROR";
-            //Environment.Exit(1);
+        if (!int.TryParse(args[0].ToString(), out int output)) {
+            IError err = new ErrorConversionFailed();
+            err.SetError();
+            return err;
         }
  
         return output;
     }
-    public static object? ConvertToString(object?[] args)
-    {
+    public static object? ConvertToString(object?[] args) {
         if (args.Length != 1)
             new Error("Function \"ConvertToString\" expects 1 argument.");
  
         return args[0].ToString();
+    }
+    // SECTION: Error handling
+    public static object? OK(object?[] args) {
+        return !(args[0] is Errors.IError);
     }
 }

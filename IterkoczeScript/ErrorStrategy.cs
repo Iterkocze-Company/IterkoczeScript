@@ -9,50 +9,15 @@ using Antlr4.Runtime.Misc;
 
 namespace IterkoczeScript
 {
-    class ErrorStrategy : IAntlrErrorStrategy
-    {
-        public void ReportError(Parser recognizer, RecognitionException e)
-        {
-            // Custom error handling logic goes here
-        }
+    class ErrorStrategy : BaseErrorListener {
+        public override void SyntaxError([NotNull] IRecognizer recognizer, [Nullable] IToken offendingSymbol, int line, int charPositionInLine, [NotNull] string msg, [Nullable] RecognitionException e) {
+            var oldColour = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write("[SYNTAX ERROR] " + msg + " line " + line);
+            Console.ForegroundColor = oldColour;
 
-        public void Reset(Parser recognizer)
-        {
-            // Reset error state
-        }
-
-        public void Recover(Parser recognizer, RecognitionException e)
-        {
-            // Attempt to recover from an error by consuming extra tokens
-        }
-
-        public IToken RecoverFromMismatchedToken(Parser recognizer, IToken t, int ttype, BitSet follow)
-        {
-            // Attempt to recover from a mismatched token error
-            return null;
-        }
-
-        IToken IAntlrErrorStrategy.RecoverInline(Parser recognizer)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Sync([NotNull] Parser recognizer)
-        {
-            //Console.WriteLine(recognizer.Context.start.Text);
-            //Environment.Exit(-1);
-            //throw new NotImplementedException();
-        }
-
-        public bool InErrorRecoveryMode([NotNull] Parser recognizer)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ReportMatch([NotNull] Parser recognizer)
-        {
-            //Console.WriteLine(recognizer.Context.start.Text);
-            throw new NotImplementedException();
+            Environment.Exit(-1);
+            base.SyntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
         }
     }
 }

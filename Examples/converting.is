@@ -1,20 +1,15 @@
 str = "Hello";
 val = 12;
 
-def TryToConvert
-{
-    if ConvertToInt($0) == ERROR
-    {
-        Write("Cannot convert the value!", RED)
-        Exit(1);
-    }
-    else
-    {
+def TryToConvert {
+    if (OK(ConvertToInt($0))) {
         Write("The value was converted!");
+    }
+    else {
+        Write(ERROR, RED);
+        Exit(1);
     }
 }
 
 TryToConvert(val);
 TryToConvert(str);
-
-
