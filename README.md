@@ -1,6 +1,6 @@
 # IterkoczeScript
 ### Slower Than Python!
- IterkoczeScript is an interpreted programming language written in C#.
+ Perfectly slow and bad. As all Iterkocze programs should be.
  
  Getting started with IterkoczeScript? - Visit the wiki:
  https://github.com/Iterkocze-Company/IterkoczeScript/wiki
