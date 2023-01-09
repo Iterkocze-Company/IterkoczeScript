@@ -3,12 +3,10 @@ def Struct Person {
     member Age;
 }
 
+new Array Persons[1];
+
 new Struct Person P1;
+Persons[0] = P1;
+Persons[0]:Name = "hoh";
 
-P1:Name = "John";
-P1:Age = 18;
-
-foreach (p in Person) {
-    Write(p:Name);
-    Write(p:Age);
-}
+Write(Persons[0]:Name);

@@ -1,6 +1,6 @@
 def Struct Person {
-    Name;
-    Age;
+    member Name;
+    member Age;
 }
 
 new Struct Person P1;
