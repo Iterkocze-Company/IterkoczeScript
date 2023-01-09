@@ -3,7 +3,7 @@ grammar IterkoczeScript;
 program: line* EOF;
 line: statement | ifBlock | forBlock | whileBlock | foreachBlock | functionDefinition | structOperation;
 
-statement: (arrayOperation | assingment | listOperation | structMemberDefinition | structOperation | expression | functionCall | returnStatement) ';';
+statement: (useDirective | arrayOperation | assingment | listOperation | structMemberDefinition | structOperation | expression | functionCall | returnStatement) ';';
 
 listOperation
     : 'new List' IDENTIFIER                             #listCreation
@@ -47,6 +47,8 @@ methodCall: IDENTIFIER '.' functionCall;
 DEFINE: 'def' | 'define';
 
 structMemberDefinition: IDENTIFIER;
+
+useDirective: ('@use' || '#use') IDENTIFIER;
 
 expression
     : constant                                              #constantExp

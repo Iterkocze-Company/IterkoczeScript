@@ -27,8 +27,8 @@ public static class Program {
             }
         }
 
+        // delete the references to @use
         finalContent += fileContent;
-
         
         AntlrInputStream inputStream = new(finalContent);
         IterkoczeScriptLexer IterkoczeLexer = new(inputStream);

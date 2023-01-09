@@ -1,2 +1,2 @@
-dotnet publish -c release --sc -p:PublishSingleFile=true
-dotnet publish -c release --sc -p:PublishSingleFile=true -r linux-x64
+dotnet publish -c release --sc -p:PublishSingleFile=true -p:PublishTrimmed=true
+dotnet publish -c release --sc -p:PublishSingleFile=true -p:PublishTrimmed=true -r linux-x64

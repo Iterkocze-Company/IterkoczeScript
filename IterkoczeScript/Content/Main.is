@@ -1,1 +1,3 @@
-Write("YAS", GREEN);
+@use TryConvert;
+
+Write(TryConvertInt("e"));

@@ -1,3 +1,7 @@
+Changelog for version 1.0.x
+	- Fixed importing script files and libraries with `using`,
+	- Updated libraries
+
 Changelog for version 1.0.2
 	- New error system,
 	- Updated some examples,

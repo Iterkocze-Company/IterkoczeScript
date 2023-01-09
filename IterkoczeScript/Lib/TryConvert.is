@@ -1,13 +1,10 @@
-def TryConvertInt
-{
+def TryConvertInt {
     res = ConvertToInt($0);
-    if res == ERROR
-    {
-        Write("Cannot convert the value!", RED)
-        Exit(1);
-    }
-    else
-    {
+    if (OK(res)) {
         return res;
+    }
+    else {
+        Write("Cannot convert the value!", RED);
+        Exit(1);
     }
 }
