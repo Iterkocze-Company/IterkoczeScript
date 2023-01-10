@@ -6,7 +6,6 @@ vars[0] = "Test";
 vars[1] = "Test2";
 vars[2] = "Test3";
 
-for (i = 0; i <= size-1; 1)
-{
+for (i = 0; i <= size-1; 1) {
     Write(vars[i]);
 }

@@ -1,5 +1,5 @@
-new Dictionary D1;
+@use Utility;
 
-D1["TEST"] = 10;
-
-Write(D1["TEST"]);
+if (GetStrLen("Hello") == 5) {
+    Write("The length of the string is 5", BLUE);
+}

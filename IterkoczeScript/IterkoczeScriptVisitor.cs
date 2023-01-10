@@ -23,29 +23,32 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         PREDEF_VARS["ERROR"] = new("NONE", true, true);
 
         // Utility
-        STANDARD_FUNCTIONS["Argument"] = new Func<object?[], object?>(StandardFunctions.Argument);
-        STANDARD_FUNCTIONS["ArgumentCount"] = new Func<object?[], object?>(StandardFunctions.ArgumentCount);
-        STANDARD_FUNCTIONS["Exit"] = new Func<object?[], object?>(StandardFunctions.Exit);
-        STANDARD_FUNCTIONS["OK"] = new Func<object?[], object?>(StandardFunctions.OK);
-        STANDARD_FUNCTIONS["StartRuntimeTimer"] = new Func<object?[], object?>(StandardFunctions.StartRuntimeTimer);
-        STANDARD_FUNCTIONS["StopRuntimeTimer"] = new Func<object?[], object?>(StandardFunctions.StopRuntimeTimer);
-        STANDARD_FUNCTIONS["GetRuntime"] = new Func<object?[], object?>(StandardFunctions.GetRuntime);
-        STANDARD_FUNCTIONS["Execute"] = new Func<object?[], object?>(StandardFunctions.Execute);
-        STANDARD_FUNCTIONS["Linux"] = new Func<object?[], object?>(StandardFunctions.Linux);
+        STANDARD_FUNCTIONS["Argument"] = new Func<object?[], object?>(Functions.Utility.Argument);
+        STANDARD_FUNCTIONS["ArgumentCount"] = new Func<object?[], object?>(Functions.Utility.ArgumentCount);
+        STANDARD_FUNCTIONS["Exit"] = new Func<object?[], object?>(Functions.Utility.Exit);
+        STANDARD_FUNCTIONS["OK"] = new Func<object?[], object?>(Functions.Utility.OK);
+        STANDARD_FUNCTIONS["StartRuntimeTimer"] = new Func<object?[], object?>(Functions.Utility.StartRuntimeTimer);
+        STANDARD_FUNCTIONS["StopRuntimeTimer"] = new Func<object?[], object?>(Functions.Utility.StopRuntimeTimer);
+        STANDARD_FUNCTIONS["GetRuntime"] = new Func<object?[], object?>(Functions.Utility.GetRuntime);
+        STANDARD_FUNCTIONS["Execute"] = new Func<object?[], object?>(Functions.Utility.Execute);
+        STANDARD_FUNCTIONS["Linux"] = new Func<object?[], object?>(Functions.Utility.Linux);
 
+        // IO
+        STANDARD_FUNCTIONS["WriteToFile"] = new Func<object?[], object?>(Functions.IO.WriteToFile);
+        STANDARD_FUNCTIONS["ReadFromFile"] = new Func<object?[], object?>(Functions.IO.ReadFromFile);
 
 
         // BASIC
-        STANDARD_FUNCTIONS["Write"] = new Func<object?[], object?>(StandardFunctions.Write);
-        STANDARD_FUNCTIONS["WriteToFile"] = new Func<object?[], object?>(StandardFunctions.WriteToFile);
-        STANDARD_FUNCTIONS["ReadFromFile"] = new Func<object?[], object?>(StandardFunctions.ReadFromFile);
-        STANDARD_FUNCTIONS["Read"] = new Func<object?[], object?>(StandardFunctions.Read);
-        STANDARD_FUNCTIONS["ReadAsInt"] = new Func<object?[], object?>(StandardFunctions.ReadAsInt);
-        STANDARD_FUNCTIONS["GetChar"] = new Func<object?[], object?>(StandardFunctions.GetChar);
+        STANDARD_FUNCTIONS["Write"] = new Func<object?[], object?>(Functions.Basic.Write);
+        STANDARD_FUNCTIONS["Read"] = new Func<object?[], object?>(Functions.Basic.Read);
+        STANDARD_FUNCTIONS["ReadAsInt"] = new Func<object?[], object?>(Functions.Basic.ReadAsInt);
+
+        // STRINGS
+        STANDARD_FUNCTIONS["GetChar"] = new Func<object?[], object?>(Functions.Strings.GetChar);
         
         // CONVERTION
-        STANDARD_FUNCTIONS["ConvertToInt"] = new Func<object?[], object?>(StandardFunctions.ConvertToInt);
-        STANDARD_FUNCTIONS["ConvertToString"] = new Func<object?[], object?>(StandardFunctions.ConvertToString);
+        STANDARD_FUNCTIONS["ConvertToInt"] = new Func<object?[], object?>(Functions.Conversion.ConvertToInt);
+        STANDARD_FUNCTIONS["ConvertToString"] = new Func<object?[], object?>(Functions.Conversion.ConvertToString);
 
         // NETWORK
         STANDARD_FUNCTIONS["IsServerUp"] = new Func<object?[], object?>(Network.IsServerUp);
@@ -118,7 +121,8 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
                 _ = new RuntimeError($"Index {index} was out of bounds for array {arrayName} of size {Utility.GetRealArrayLenght(currentFunction.Arrays[arrayName])}.", context);
             }
         }
-        foreach (var VARIABLE in currentFunction.Lists) { //If it's a List
+        //If it's a List
+        foreach (var VARIABLE in currentFunction.Lists) { 
             if (VARIABLE.Key == arrayName) {
                 if (currentFunction.Lists[arrayName].Count <= (int)index) {
                    _ = new RuntimeError($"Index {index} was out of bounds in the List {arrayName}!");
@@ -126,10 +130,13 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
                 return currentFunction.Lists[arrayName][(int)index];
             }
         }
-        foreach (var VARIABLE in DICTIONARIES) //If it's a Dictionary
-        { 
+        //If it's a Dictionary
+        foreach (var VARIABLE in DICTIONARIES) { 
             if (VARIABLE.Key == arrayName) {
-                return DICTIONARIES[arrayName][index.ToString()];
+                if (DICTIONARIES[arrayName].TryGetValue("\"" + index.ToString() + "\"", out object? val)) {
+                    return val;
+                }
+                _ = new RuntimeError($"Element {index} wasn't found in Dictionary {arrayName}", context);
             }
         }
         return null;
@@ -331,12 +338,9 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
             }
         }
 
-        foreach (var VARIABLE in currentFunction.Lists)
-        {
-            if (target is List<object?>)
-            {
-                foreach (var VARIABLE2 in (List<object?>)target)
-                {
+        foreach (var VARIABLE in currentFunction.Lists) {
+            if (target is List<object?>) {
+                foreach (var VARIABLE2 in (List<object?>)target) {
                     currentFunction.VARS.Add(variable, new(VARIABLE2, false, false));
                     Visit(context.block());
                     currentFunction.VARS.Remove(variable);
@@ -347,11 +351,11 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
             return null;
         }
 
-        currentFunction.VARS[variable] = null;
+        //currentFunction.VARS[variable] = null;
 
-        foreach (var v in target.ToString())
-        {
-            currentFunction.VARS[variable].Value = v;
+        foreach (var v in target.ToString()) {
+            //currentFunction.VARS[variable].Value = v;
+            currentFunction.VARS[variable] = new(v);
             Visit(context.block());
         }
 
@@ -450,7 +454,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         
         foreach (var VAR in PREDEF_VARS) {
             if (VAR.Key == varName)
-                return PREDEF_VARS[varName];
+                return PREDEF_VARS[varName].Value;
         }
         
         foreach (var st in currentFunction.Structs) {
@@ -611,7 +615,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         var fieldName = context.STRING().GetText();
         var val = Visit(context.expression());
 
-        DICTIONARIES[dicName].Add(fieldName, val);
+        DICTIONARIES[dicName][fieldName] = val;
 
         return 0;
     }

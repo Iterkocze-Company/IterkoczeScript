@@ -1,0 +1,6 @@
+new Dictionary D1;
+
+D1["TEST"] = 10;
+
+Write(D1["TEST"]);
+Write(D1["NONE"]);

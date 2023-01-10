@@ -39,7 +39,7 @@ foreachBlock: 'foreach' '(' IDENTIFIER 'in' expression ')' block;
 
 elseIfBlock: block | ifBlock;
 
-whileBlock: WHILE '(' expression ')' block ('else' elseIfBlock);
+whileBlock: WHILE '(' expression ')' block ('else' elseIfBlock)?; //RECENT UPDATE WITH `?` WATCH OUT
 
 WHILE: 'while';
 

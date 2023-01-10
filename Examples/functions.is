@@ -1,5 +1,4 @@
-def Function
-{
+def Function {
     Write($0);
     return 12;
 }
