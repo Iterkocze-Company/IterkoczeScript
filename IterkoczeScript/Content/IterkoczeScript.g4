@@ -5,7 +5,12 @@ line: statement | ifBlock | forBlock | whileBlock | foreachBlock | functionDefin
 
 statement: (catapult | useDirective | arrayOperation | assingment | listOperation 
         | structMemberDefinition | structOperation | expression
-        | functionCall | returnStatement) ';';
+        | functionCall | returnStatement | dictionaryOperation) ';';
+
+dictionaryOperation
+    : 'new Dictionary' IDENTIFIER                       #dictionaryCreation
+    | IDENTIFIER '[' STRING ']' '=' expression          #dictionaryAssingment
+    ;
 
 listOperation
     : 'new List' IDENTIFIER                             #listCreation

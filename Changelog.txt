@@ -1,4 +1,5 @@
 Changelog for version 1.x.0
+	- Fixed foreach on Lists,
 	- Reworked Structs. Now in order to define members, use the `member` keyword,
 	- Rewritten the variable system,
 	- Added constants,

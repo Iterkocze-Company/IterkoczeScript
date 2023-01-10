@@ -10,7 +10,7 @@ public class StandardFunctions {
 
         if (args.Length == 2) {
             var oldColour = Console.ForegroundColor;
-            var colour = args[1];
+            ConsoleColor colour = (ConsoleColor)((Variable)args[1]).Value; // KEKW
             switch (colour) {
                 case ConsoleColor.Red:
                     Console.ForegroundColor = ConsoleColor.Red;

@@ -7,14 +7,12 @@ namespace IterkoczeScript;
 
 public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
     private bool ShouldEndLoop = false;
-    //private Dictionary<string, Variable> VARS { get; } = new();
+    public static Dictionary<string, Dictionary<string, object?>> DICTIONARIES { get; } = new();
     public static Dictionary<string, Variable> PREDEF_VARS { get; } = new();
     public static Dictionary<string, Variable> GLOBAL_VARS { get; } = new ();
-    //public static Dictionary<string, Variable> CONST_VARS { get; } = new();
     private Dictionary<string, object?> STANDARD_FUNCTIONS { get; } = new();
     private List<Function> FUNCTIONS { get; } = new();
-    private static Function mainFunction = new("Main", null);
-    private Function currentFunction = mainFunction;
+    private Function currentFunction = new("Main", null);
 
     public IterkoczeScriptVisitor()
     {
@@ -126,6 +124,12 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
                    _ = new RuntimeError($"Index {index} was out of bounds in the List {arrayName}!");
                 }
                 return currentFunction.Lists[arrayName][(int)index];
+            }
+        }
+        foreach (var VARIABLE in DICTIONARIES) //If it's a Dictionary
+        { 
+            if (VARIABLE.Key == arrayName) {
+                return DICTIONARIES[arrayName][index.ToString()];
             }
         }
         return null;
@@ -333,8 +337,9 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
             {
                 foreach (var VARIABLE2 in (List<object?>)target)
                 {
-                    currentFunction.VARS[variable].Value = VARIABLE2;
+                    currentFunction.VARS.Add(variable, new(VARIABLE2, false, false));
                     Visit(context.block());
+                    currentFunction.VARS.Remove(variable);
                 }
                 currentFunction.VARS.Remove(variable);
             }
@@ -589,6 +594,26 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
 
         Environment.Exit(-1);
         return -1;
+    }
+
+    public override object VisitDictionaryCreation([NotNull] IterkoczeScriptParser.DictionaryCreationContext context) {
+        //TODO SOMETHING HERE
+        var dictionaryName = context.IDENTIFIER().GetText();
+        var Dic = new Dictionary<string, object>();
+        //Dic[dictionaryName] = new Dictionary<string, object>();
+
+        DICTIONARIES.Add(dictionaryName, Dic);
+        return 0;
+    }
+
+    public override object VisitDictionaryAssingment([NotNull] IterkoczeScriptParser.DictionaryAssingmentContext context) {
+        var dicName = context.IDENTIFIER().GetText();
+        var fieldName = context.STRING().GetText();
+        var val = Visit(context.expression());
+
+        DICTIONARIES[dicName].Add(fieldName, val);
+
+        return 0;
     }
 
     private bool IsTrue(object? value) {
