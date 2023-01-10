@@ -1,0 +1,3 @@
+perhaps {
+	Write("Hash of 'HELLO' is valid", GREEN);
+} if (SHA1("HELLO") == "C65F99F8C5376ADADDDC46D5CBCF5762F9E55EB7");

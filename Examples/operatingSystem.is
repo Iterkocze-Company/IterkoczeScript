@@ -1,5 +1,6 @@
-if (Linux()) {
+perhaps  {
 	Write("You are on Linux! No need to thank me for that info. I bet you didn't know");
-} else {
+} if (Linux()); 
+otherwise {
 	Write("You are not on Linux");
 }

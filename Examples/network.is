@@ -1,11 +1,13 @@
-if (OK(IsServerUp("gentoo.org"))) {
+perhaps  {
 	Write("OK!", GREEN);
-} else {
+} if (OK(IsServerUp("gentoo.org")));
+otherwise  {
 	Write(ERROR, RED);
 }
 
-if (OK(IsServerUp("gentoo.org1", 1))) {
+perhaps  {
 	Write("OK!", GREEN);
-} else {
+} if (OK(IsServerUp("gentoo.org1", 1)));
+otherwise {
 	Write(ERROR, RED);
 }

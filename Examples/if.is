@@ -1,3 +1,3 @@
-if (1 == 2 or 1 == 1) {
+perhaps {
     Write("Hello");
-}
+} if (1 == 2 or 1 == 1);

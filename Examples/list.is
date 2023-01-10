@@ -7,6 +7,6 @@ L1.Add(46);
 
 L1.Add("Hello");
 
-foreach (val in L1) {
+each (val in L1) {
     Write(val);
 }

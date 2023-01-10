@@ -1,2 +1,0 @@
-Add hashing
-Iterkocze UUID genration

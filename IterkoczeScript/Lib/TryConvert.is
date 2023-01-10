@@ -1,9 +1,12 @@
-def TryConvertInt {
+// Kinda useless since I've made it so ConvertToInt actually raises an error.
+// Actually, it's outdated. Don't use it. But I'll leave it here because I can
+
+meth TryConvertInt {
     res = ConvertToInt($0);
-    if (OK(res)) {
-        return res;
-    }
-    else {
+    perhaps  {
+        give res;
+    } if (OK(res));
+    otherwise {
         Write("Cannot convert the value!", RED);
         Exit(1);
     }

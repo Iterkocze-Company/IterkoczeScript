@@ -12,7 +12,7 @@ P1:Age = 18;
 P2:Name = "James";
 P2:Age = 22;
 
-foreach (p in Person) {
+each (p in Person) {
     Write(p:Name);
     Write(p:Age);
 }

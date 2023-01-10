@@ -1,6 +1,6 @@
-def Function {
+meth Function {
     Write($0);
-    return 12;
+    give 12;
 }
 
 Write(Function("Hello"));

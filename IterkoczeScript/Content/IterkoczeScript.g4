@@ -29,13 +29,13 @@ arrayOperation
     | IDENTIFIER '[' INTEGER ']' ':' IDENTIFIER '=' expression  #arrayStructMemberAccessAssingment
     ;
 
-returnStatement: 'return' expression;
+returnStatement: 'give' expression;
 
-ifBlock: IF '(' expression ')' block ('else' elseIfBlock)?;
+ifBlock: 'perhaps' block  IF '(' expression ')' ';' ('otherwise' elseIfBlock)?;
 
 forBlock: 'for' '(' assingment ';' expression ';' INTEGER ')' block;
 
-foreachBlock: 'foreach' '(' IDENTIFIER 'in' expression ')' block;
+foreachBlock: 'each' '(' IDENTIFIER 'in' expression ')' block;
 
 elseIfBlock: block | ifBlock;
 
@@ -45,7 +45,7 @@ WHILE: 'while';
 
 IF: 'if';
 
-functionDefinition: DEFINE IDENTIFIER block;
+functionDefinition: 'meth' IDENTIFIER block;
 
 functionCall: IDENTIFIER '(' (expression (',' expression)*)? ')';
 

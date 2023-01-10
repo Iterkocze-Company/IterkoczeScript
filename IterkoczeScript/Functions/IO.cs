@@ -14,4 +14,10 @@ public static class IO {
 
         return File.ReadAllText(args[0].ToString());
     }
+    public static object? FileExists(object?[] args) {
+        if (args.Length != 1)
+            _ = new RuntimeError("Function \"FileExists\" expects 1 argument.");
+
+        return File.Exists(args[0].ToString());
+    }
 }

@@ -1,5 +1,5 @@
 str = "Hello";
 
-foreach (c in str) {
+each (c in str) {
     Write(c);
 }

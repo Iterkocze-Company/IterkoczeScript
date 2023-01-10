@@ -1,4 +1,6 @@
-﻿namespace IterkoczeScript.Functions;
+﻿using IterkoczeScript.Errors;
+
+namespace IterkoczeScript.Functions;
 
 public static class Basic {
     public static object? Write(object?[] args) {
@@ -53,7 +55,13 @@ public static class Basic {
 
         if (args.Length == 1)
             Console.Write(args[0]);
-        return Convert.ToInt32(Console.ReadLine());
+
+        try { return Convert.ToInt32(Console.ReadLine()); }
+        catch (Exception e) {
+            IError err = new ErrorConversionFailed();
+            err.SetError();
+            return err;
+        }
     }
 }
 

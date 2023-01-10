@@ -1,3 +1,20 @@
+Changelog for version 1.2.0
+	- Fixed a crash if you wanted to `#use` or `@use` a script file that didn't existed,
+	- Updated all libraries to use the new syntax,
+	- Changed all examples to use the new syntax,
+	- Added a "very secure" UUID generator with `IterkoczeUUID()`,
+	- Added hashing with SHA1 and the `SHA1` function,
+	- Now `ReadAsInt` raises ErrorConversionFailed,
+	- Fixed a crash if you left the `ReadAsInt` input blank,
+	- Now `StopRuntimeTimer` also clears the elapsed time,
+	- Added `ToLower` and `ToUpper` for strings,
+	- Added a new IO Standard Function `FileExists`,
+	- Changed the way you define methods/functions. In this language it's all the same :)
+	- Changed `foreach` to `each`,
+	- Changed `return` to `give`,
+	- Changed `else` to be `otherwise`,
+	- Changed C like if block to be more fitting for the language,
+
 Changelog for version 1.1.0
 	- Updaed all examples,
 	- Fixed a lot of minor bugs,

@@ -36,6 +36,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         // IO
         STANDARD_FUNCTIONS["WriteToFile"] = new Func<object?[], object?>(Functions.IO.WriteToFile);
         STANDARD_FUNCTIONS["ReadFromFile"] = new Func<object?[], object?>(Functions.IO.ReadFromFile);
+        STANDARD_FUNCTIONS["FileExists"] = new Func<object?[], object?>(Functions.IO.FileExists);
 
 
         // BASIC
@@ -45,13 +46,21 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
 
         // STRINGS
         STANDARD_FUNCTIONS["GetChar"] = new Func<object?[], object?>(Functions.Strings.GetChar);
-        
+        STANDARD_FUNCTIONS["ToLower"] = new Func<object?[], object?>(Functions.Strings.ToLower);
+        STANDARD_FUNCTIONS["ToUpper"] = new Func<object?[], object?>(Functions.Strings.ToUpper);
+
+
         // CONVERTION
         STANDARD_FUNCTIONS["ConvertToInt"] = new Func<object?[], object?>(Functions.Conversion.ConvertToInt);
         STANDARD_FUNCTIONS["ConvertToString"] = new Func<object?[], object?>(Functions.Conversion.ConvertToString);
 
         // NETWORK
         STANDARD_FUNCTIONS["IsServerUp"] = new Func<object?[], object?>(Network.IsServerUp);
+
+        // "SECURITY" LULW
+        STANDARD_FUNCTIONS["SHA1"] = new Func<object?[], object?>(Security.SHA1);
+        STANDARD_FUNCTIONS["IterkoczeUUID"] = new Func<object?[], object?>(Security.IterkoczeUUID);
+
     }
 
     public override object? VisitListCreation(IterkoczeScriptParser.ListCreationContext context) {

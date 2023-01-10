@@ -17,17 +17,24 @@ public static class Program {
         string fileName = args[0];
         string fileContent = File.ReadAllText(fileName);
         string finalContent = String.Empty;
+        string currentlyImportedFileName = "NONE";
 
-        foreach (string line in fileContent.Split('\n')) {
-            if (line.Contains("@use"))  {
-                finalContent += File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "Lib\\"+line.Remove(0, line.IndexOf(' ')).Replace(";", "").Trim() + ".is");
-            }
-            if (line.Contains("#use")) {
-                finalContent += File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + line.Remove(0, line.IndexOf(' ')).Replace(";", "").Trim() + ".is");
+        try {
+            foreach (string line in fileContent.Split('\n')) {
+                if (line.Contains("@use")) {
+                    currentlyImportedFileName = "Lib\\" + line.Remove(0, line.IndexOf(' ')).Replace(";", "").Trim() + ".is";
+                    finalContent += File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "Lib\\" + line.Remove(0, line.IndexOf(' ')).Replace(";", "").Trim() + ".is");
+                }
+                if (line.Contains("#use")) {
+                    currentlyImportedFileName = line.Remove(0, line.IndexOf(' ')).Replace(";", "").Trim() + ".is";
+                    finalContent += File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + line.Remove(0, line.IndexOf(' ')).Replace(";", "").Trim() + ".is");
+                }
             }
         }
+        catch (Exception ex) {
+            _ = new RuntimeError($"Can't import {currentlyImportedFileName}. It probably doesn't exist");
+        }
 
-        // delete the references to @use
         finalContent += fileContent;
         
         AntlrInputStream inputStream = new(finalContent);

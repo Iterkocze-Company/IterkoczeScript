@@ -1,11 +1,11 @@
 str = "Hello";
 val = 12;
 
-def TryToConvert {
-    if (OK(ConvertToInt($0))) {
+meth TryToConvert {
+    perhaps  {
         Write("The value was converted!");
-    }
-    else {
+    } if (OK(ConvertToInt($0)));
+    otherwise {
         Write(ERROR, RED);
         Exit(1);
     }
