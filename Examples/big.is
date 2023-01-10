@@ -1,0 +1,35 @@
+StartRuntimeTimer();
+
+def Struct Kokos {
+	member sok;
+}
+
+Write("Hello. I will now ping gentoo.org...");
+perhaps  {
+	Write("All good", GREEN);
+} if (OK(IsServerUp("gentoo.org")));
+otherwise {
+	Write(ERROR, RED);
+}
+
+remember shouldStop = false;
+
+while (!shouldStop) {
+	Write("Type 'Stop' to stop this loop");
+	perhaps {
+		shouldStop = true;
+	} if (ToLower(Read()) == "stop");
+}
+
+StopRuntimeTimer();
+
+msg = "This took " + GetRuntime() + " milliseconds";
+
+Write(msg);
+WriteToFile("time.txt", msg);
+
+each (ch in msg) {
+	perhaps {
+		Write("TTT");
+	} if (ch == "T");
+}

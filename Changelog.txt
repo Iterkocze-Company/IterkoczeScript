@@ -1,4 +1,7 @@
 Changelog for version 1.2.0
+	- Now `flase`, `non` and `lie` are another form of `false` and can be used interchangeably,
+	- Further changes to variable system. Now if you want to add `const` or `global` to your variable. You have to use `remember`, but you don't have to if you are defining your var with no const or global,
+	- (Not a change in the interpreter but) Added syntax highlight file for Notepad++,
 	- Fixed a crash if you wanted to `#use` or `@use` a script file that didn't existed,
 	- Updated all libraries to use the new syntax,
 	- Changed all examples to use the new syntax,
@@ -6,7 +9,7 @@ Changelog for version 1.2.0
 	- Added hashing with SHA1 and the `SHA1` function,
 	- Now `ReadAsInt` raises ErrorConversionFailed,
 	- Fixed a crash if you left the `ReadAsInt` input blank,
-	- Now `StopRuntimeTimer` also clears the elapsed time,
+	- Added `ClearRuntimeTimer()` to clear the RuntimeTimer duh,
 	- Added `ToLower` and `ToUpper` for strings,
 	- Added a new IO Standard Function `FileExists`,
 	- Changed the way you define methods/functions. In this language it's all the same :)

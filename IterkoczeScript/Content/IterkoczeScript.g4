@@ -3,7 +3,7 @@ grammar IterkoczeScript;
 program: line* EOF;
 line: statement | ifBlock | forBlock | whileBlock | foreachBlock | functionDefinition | structOperation;
 
-statement: (catapult | useDirective | arrayOperation | assingment | listOperation 
+statement: (variableDefinition | catapult | useDirective | arrayOperation | assingment | listOperation 
         | structMemberDefinition | structOperation | expression
         | functionCall | returnStatement | dictionaryOperation) ';';
 
@@ -59,6 +59,8 @@ useDirective: ('@use' || '#use') IDENTIFIER;
 
 catapult: 'catapult' IDENTIFIER;
 
+variableDefinition: 'remember' GLOBAL? CONST? IDENTIFIER '=' expression;
+
 expression
     : constant                                              #constantExp
     | '$' INTEGER                                           #argumentIdentifierExp
@@ -80,7 +82,7 @@ expression
     | 'crack'                                               #crackLoopExp
     ;
     
-assingment: ('global' || 'const')? IDENTIFIER '=' expression;  
+assingment: IDENTIFIER '=' expression;  
     
 mathOp: '+' | '-' | '*' | '/' | '%' | '^';
 compareOp: '==' | '!=' | '>' | '<' | '>=' | '<=';
@@ -89,12 +91,16 @@ booleanOp: BOOLEAN_OPERATOR;
 BOOLEAN_OPERATOR: 'and' | 'or';
 INVERT_OPERATOR: 'not' | '!';
     
+//VAR_MOD: ('global' & 'const') ;
+GLOBAL: 'global';
+CONST: 'const';
+
 constant: INTEGER | FLOAT | STRING | BOOLEAN | NULL;
 
 INTEGER: [0-9]+;
 FLOAT: [0-9]+ '.' [0-9]+;
 STRING: ('"' ~'"'* '"') | ('\'' ~'\''* '\'');
-BOOLEAN: 'true' | 'false';
+BOOLEAN: 'true' | ('false' | 'flase' | 'non' | 'lie');
 NULL: 'null';  
 
 block: '{' line* '}'; 

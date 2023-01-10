@@ -41,6 +41,10 @@ public static class Utility {
         return null;
     }
     public static object? StopRuntimeTimer(object?[] args) {
+        watch.Stop();
+        return null;
+    }
+    public static object? ClearRuntimeTimer(object?[] args) {
         watch.Reset();
         return null;
     }

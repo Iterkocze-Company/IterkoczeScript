@@ -1,4 +1,4 @@
-size = 10;
+remember const size = 10;
 
 new Array vars[size];
 

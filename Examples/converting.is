@@ -1,5 +1,5 @@
-str = "Hello";
-val = 12;
+remember const str = "Hello";
+remember const val = 12;
 
 meth TryToConvert {
     perhaps  {

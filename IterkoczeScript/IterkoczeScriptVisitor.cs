@@ -2,6 +2,7 @@ using Antlr4.Runtime.Misc;
 using IterkoczeScript.Content;
 using IterkoczeScript.Errors;
 using IterkoczeScript.Functions;
+using System.Runtime.CompilerServices;
 
 namespace IterkoczeScript;
 
@@ -30,6 +31,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         STANDARD_FUNCTIONS["StartRuntimeTimer"] = new Func<object?[], object?>(Functions.Utility.StartRuntimeTimer);
         STANDARD_FUNCTIONS["StopRuntimeTimer"] = new Func<object?[], object?>(Functions.Utility.StopRuntimeTimer);
         STANDARD_FUNCTIONS["GetRuntime"] = new Func<object?[], object?>(Functions.Utility.GetRuntime);
+        STANDARD_FUNCTIONS["ClearRuntimeTimer"] = new Func<object?[], object?>(Functions.Utility.ClearRuntimeTimer);
         STANDARD_FUNCTIONS["Execute"] = new Func<object?[], object?>(Functions.Utility.Execute);
         STANDARD_FUNCTIONS["Linux"] = new Func<object?[], object?>(Functions.Utility.Linux);
 
@@ -69,25 +71,44 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         return null;
     }
 
-    public override object? VisitAssingment(IterkoczeScriptParser.AssingmentContext context) {
+    public override object VisitVariableDefinition([NotNull] IterkoczeScriptParser.VariableDefinitionContext context) {
         var varName = context.IDENTIFIER().GetText();
-        bool isGlobal = context.start.Text.ToString() == "global" ? true : false;
-        bool isConst = context.start.Text.ToString() == "const" ? true : false;
+        bool isGlobal = context.GLOBAL()?.GetText() == "global" ? true : false;
+        bool isConst = context.CONST()?.GetText() == "const" ? true : false;
         var value = Visit(context.expression());
 
         if (GLOBAL_VARS.ContainsKey(varName))
-             GLOBAL_VARS[varName].Value = value;
+            GLOBAL_VARS[varName].Value = value;
+
+        if (!currentFunction.VARS.ContainsKey(varName))
+            currentFunction.VARS.Add(varName, new(value, isGlobal, isConst));
+        else
+            _ = new RuntimeError($"Variable {varName} already exists", context);
+
+        if (currentFunction.VARS[varName].isGlobal)
+            GLOBAL_VARS.Add(varName, currentFunction.VARS[varName]);
+
+        return "VARIABLE DEFINTION";
+    }
+
+    public override object? VisitAssingment(IterkoczeScriptParser.AssingmentContext context) {
+        var varName = context.IDENTIFIER().GetText();
+        var value = Visit(context.expression());
 
         if (currentFunction.VARS.ContainsKey(varName)) {
             if (currentFunction.VARS[varName].isConstant)
                 _ = new RuntimeError($"Can't write to a constant {varName}", context);
-             
+
             currentFunction.VARS[varName].Value = value;
             return currentFunction.VARS[varName].Value;
         }
-        currentFunction.VARS.Add(varName, new(value, isGlobal, isConst));
-        if (currentFunction.VARS[varName].isGlobal)
-            GLOBAL_VARS.Add(varName, currentFunction.VARS[varName]);
+        if (!currentFunction.VARS.ContainsKey(varName))
+            currentFunction.VARS.Add(varName, new(value, false, false));
+
+        currentFunction.VARS[varName].Value = value;
+
+        if (!currentFunction.VARS.ContainsKey(varName))
+            _ = new RuntimeError($"Variable {varName} wasn't defined but tried to assign a value to.", context);
 
         return currentFunction.VARS[varName].Value;
     }
@@ -112,7 +133,9 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         if (context.expression() == null) {
            _ = new RuntimeError($"Array \"{arrayName}\" has no size at declaration.", context);
         }
-        arraySize = (int)Visit(context.expression());
+        try { arraySize = (int)Visit(context.expression()); } 
+        catch { _ = new RuntimeError($"{arraySize} is invalid array size", context); }
+        
         currentFunction.Arrays[arrayName] = new object?[(int)arraySize];
         return null;
     }
