@@ -1,2 +1,2 @@
-Implement Dictionary
-Categorise standard functions into files
+Add hashing
+Iterkocze UUID genration
