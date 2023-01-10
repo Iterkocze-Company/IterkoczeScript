@@ -9,7 +9,7 @@ public static class Program {
             _ = new RuntimeError("You need to provide a valid path for a script file.");
         }
         if (args.Contains("-v")) {
-            Console.WriteLine("Iterkocze IterkoczeScriptInterpreter 1.0.2");
+            Console.WriteLine("Iterkocze IterkoczeScriptInterpreter 1.1.0");
             Environment.Exit(0);
         }
         ProgramArgs = new string[args.Length - 1];
