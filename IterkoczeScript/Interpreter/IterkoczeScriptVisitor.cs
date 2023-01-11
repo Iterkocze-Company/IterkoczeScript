@@ -61,6 +61,10 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         STANDARD_FUNCTIONS["SHA1"] = new Func<object?[], object?>(Security.SHA1);
         STANDARD_FUNCTIONS["IterkoczeUUID"] = new Func<object?[], object?>(Security.IterkoczeUUID);
 
+        // JSON
+        STANDARD_FUNCTIONS["Json"] = new Func<object?[], object?>(Json.Json1);
+        STANDARD_FUNCTIONS["JsonRead"] = new Func<object?[], object?>(Json.JsonRead);
+
     }
 
     public override object? VisitListCreation(IterkoczeScriptParser.ListCreationContext context) {
