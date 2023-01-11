@@ -64,7 +64,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         // JSON
         STANDARD_FUNCTIONS["Json"] = new Func<object?[], object?>(Json.Json1);
         STANDARD_FUNCTIONS["JsonRead"] = new Func<object?[], object?>(Json.JsonRead);
-
+        STANDARD_FUNCTIONS["JsonWrite"] = new Func<object?[], object?>(Json.JsonWrite);
     }
 
     public override object? VisitListCreation(IterkoczeScriptParser.ListCreationContext context) {
@@ -501,7 +501,8 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         }
 
         if (!currentFunction.VARS.ContainsKey(varName)
-            && !GLOBAL_VARS.ContainsKey(varName)) {
+            && !GLOBAL_VARS.ContainsKey(varName)
+            && !DICTIONARIES.ContainsKey(varName)) {
             _ = new RuntimeError($"Variable {varName} is not defined!", context);
         }
 

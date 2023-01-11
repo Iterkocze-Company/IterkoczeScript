@@ -1,6 +1,8 @@
 ﻿using IterkoczeScript.Interpreter;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Linq.Expressions;
+using System.Text;
 
 namespace IterkoczeScript.Functions;
 public static class Json {
@@ -37,6 +39,55 @@ public static class Json {
         }
 
         return res;
+    }
+    public static object? JsonWrite(object?[] args) {
+        if (args.Length != 2)
+            _ = new RuntimeError("Function \"JsonWrite\" expects 2 arguments. The json file name and a dictionary containing the data");
+
+        StringBuilder sb = new StringBuilder();
+        StringWriter sw = new StringWriter(sb);
+
+        var dic = IterkoczeScriptVisitor.DICTIONARIES[args[1].ToString()];
+
+
+        using (JsonWriter writer = new JsonTextWriter(sw)) {
+            writer.Formatting = Formatting.Indented;
+
+            writer.WriteStartObject();
+            foreach (var element in dic) {
+                writer.WritePropertyName(element.Key.Replace("\"", ""));
+                writer.WriteValue(element.Value);
+            }
+            //writer.WriteEnd();
+            writer.WriteEndObject();
+        }
+
+        try {
+            File.WriteAllText(args[0].ToString(), sw.ToString());
+        }
+        catch (Exception e) {
+            _ = new RuntimeError($"Can't write to {args[0]}");
+        }
+
+
+        return null;
+
+        using (JsonWriter writer = new JsonTextWriter(sw)) {
+            writer.Formatting = Formatting.Indented;
+
+            writer.WriteStartObject();
+            writer.WritePropertyName(args[1].ToString());
+            writer.WriteValue(args[2].ToString());
+            //writer.WriteEnd();
+            writer.WriteEndObject();
+        }
+        try {
+            File.WriteAllText(args[0].ToString(), sw.ToString());
+        }
+        catch (Exception e) {
+            _ = new RuntimeError($"Can't write to {args[0]}");
+        }
+        return null;
     }
 }
 
