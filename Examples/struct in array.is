@@ -1,4 +1,4 @@
-def Struct Person {
+def Struct Person -> {
     member Name;
     member Age;
 }

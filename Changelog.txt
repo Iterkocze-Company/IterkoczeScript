@@ -1,4 +1,8 @@
 Changelog for version 1.2.0
+	- Changed Struct definition syntax,
+	- Changed function definition syntax,
+	- Fixed a crash if you provided an invalid script filename to be interpreted,
+	- Added a package manager,
 	- Now `flase`, `non` and `lie` are another form of `false` and can be used interchangeably,
 	- Further changes to variable system. Now if you want to add `const` or `global` to your variable. You have to use `remember`, but you don't have to if you are defining your var with no const or global,
 	- (Not a change in the interpreter but) Added syntax highlight file for Notepad++,

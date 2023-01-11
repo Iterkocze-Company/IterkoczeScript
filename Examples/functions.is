@@ -1,4 +1,4 @@
-meth Function {
+meth Function -> {
     Write($0);
     give 12;
 }

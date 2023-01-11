@@ -1,7 +1,7 @@
 // Kinda useless since I've made it so ConvertToInt actually raises an error.
 // Actually, it's outdated. Don't use it. But I'll leave it here because I can
 
-meth TryConvertInt {
+meth TryConvertInt -> {
     res = ConvertToInt($0);
     perhaps  {
         give res;

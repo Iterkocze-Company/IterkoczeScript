@@ -16,18 +16,18 @@ public static class Utility {
         if (args.Length != 1)
             _ = new RuntimeError("Function \"Argument\" expects 1 argument.");
 
-        if (Program.ProgramArgs.Length <= (int)args[0]) {
+        if (CLI.CLI.ProgramArgs.Length <= (int)args[0]) {
             IError err = new ErrorOutOfBounds();
             err.SetError();
             return err;
         }
-        return Program.ProgramArgs[(int)args[0]];
+        return CLI.CLI.ProgramArgs[(int)args[0]];
     }
     public static object? ArgumentCount(object?[] args) {
         if (args.Length != 0)
             _ = new RuntimeError("Function \"ArgumentCount\" expects 0 arguments.");
 
-        return Program.ProgramArgs.Length;
+        return CLI.CLI.ProgramArgs.Length;
     }
     public static object? Exit(object?[] args) {
         if (args.Length != 1)

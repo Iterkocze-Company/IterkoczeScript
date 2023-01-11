@@ -19,7 +19,7 @@ listOperation
 structOperation
     : 'new Struct' IDENTIFIER IDENTIFIER                #structCreation
     | IDENTIFIER ':' IDENTIFIER '=' expression          #structAssingment
-    | DEFINE 'Struct' IDENTIFIER block                  #structDefinition
+    | DEFINE 'Struct' IDENTIFIER '->' block                  #structDefinition
     ;
     
 arrayOperation
@@ -45,7 +45,7 @@ WHILE: 'while';
 
 IF: 'if';
 
-functionDefinition: 'meth' IDENTIFIER block;
+functionDefinition: 'meth' IDENTIFIER '->' block;
 
 functionCall: IDENTIFIER '(' (expression (',' expression)*)? ')';
 

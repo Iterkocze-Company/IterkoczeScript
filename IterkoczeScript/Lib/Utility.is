@@ -1,4 +1,4 @@
-meth GetStrLen {
+meth GetStrLen -> {
     len = 0;
 
     each (c in $0) {
