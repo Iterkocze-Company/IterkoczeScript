@@ -17,4 +17,4 @@ new Dictionary D1;
 D1["kokos"] = 122;
 D1["sosos"] = 133;
 
-JsonWrite("tet.json", "D1");
+JsonWrite("tet.json", D1);

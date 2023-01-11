@@ -512,6 +512,10 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         if (currentFunction.VARS.ContainsKey(varName))
             return currentFunction.VARS[varName].Value;
 
+        if (DICTIONARIES[varName] is Dictionary<string, object?>) {
+            return DICTIONARIES[varName];
+        }
+
         return null;
     }
 

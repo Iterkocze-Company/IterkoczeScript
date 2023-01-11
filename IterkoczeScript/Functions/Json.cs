@@ -47,7 +47,7 @@ public static class Json {
         StringBuilder sb = new StringBuilder();
         StringWriter sw = new StringWriter(sb);
 
-        var dic = IterkoczeScriptVisitor.DICTIONARIES[args[1].ToString()];
+        var dic = (Dictionary<string, object?>)args[1];
 
 
         using (JsonWriter writer = new JsonTextWriter(sw)) {

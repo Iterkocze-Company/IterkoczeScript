@@ -1,8 +1,8 @@
 remember const str = "Hello";
 remember const val = 12;
 
-meth TryToConvert {
-    perhaps  {
+meth TryToConvert -> {
+    perhaps {
         Write("The value was converted!");
     } if (OK(ConvertToInt($0)));
     otherwise {

@@ -3,7 +3,7 @@
     "IterkoczeScript": {
       "commandName": "Project",
       "commandLineArgs": "Main.is",
-      "workingDirectory": "F:\\Programowanko\\IterkoczeScript-main\\IterkoczeScript\\Content",
+      "workingDirectory": "F:\\Programowanko\\IterkoczeScript-main\\IterkoczeScript\\WorkingDir",
       "hotReloadEnabled": false
     }
   }
