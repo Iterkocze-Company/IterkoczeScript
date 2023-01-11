@@ -1,4 +1,6 @@
-﻿namespace IterkoczeScript.Functions; 
+﻿using IterkoczeScript.Interpreter;
+
+namespace IterkoczeScript.Functions; 
 
 public static class Strings {
     public static object? GetChar(object?[] args) {

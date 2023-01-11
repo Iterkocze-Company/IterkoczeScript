@@ -1,6 +1,6 @@
 StartRuntimeTimer();
 
-def Struct Kokos {
+def Struct Kokos -> {
 	member sok;
 }
 
@@ -26,10 +26,15 @@ StopRuntimeTimer();
 msg = "This took " + GetRuntime() + " milliseconds";
 
 Write(msg);
-WriteToFile("time.txt", msg);
+WriteFile("time.txt", msg);
 
 each (ch in msg) {
 	perhaps {
 		Write("TTT");
 	} if (ch == "T");
 }
+
+new Struct Kokos K1;
+
+K1:sok = 112;
+Write("Hash of K1:sok " + SHA1(K1:sok));

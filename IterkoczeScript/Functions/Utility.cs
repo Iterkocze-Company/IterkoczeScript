@@ -1,4 +1,5 @@
 ﻿using IterkoczeScript.Errors;
+using IterkoczeScript.Interpreter;
 using System.Diagnostics;
 
 namespace IterkoczeScript.Functions; 

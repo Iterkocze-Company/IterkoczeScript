@@ -1,1 +1,1 @@
-Write("Result: " + WriteToFile("Output.txt", ReadAsInt("Type a number: ")*2));
+Write("Result: " + WriteFile("Output.txt", ReadAsInt("Type a number: ")*2));

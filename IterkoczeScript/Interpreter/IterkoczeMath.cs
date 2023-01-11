@@ -1,4 +1,4 @@
-namespace IterkoczeScript;
+namespace IterkoczeScript.Interpreter;
 
 public static class IterkoczeMath {
     public static object? Add(object? left, object? right) {
@@ -10,7 +10,7 @@ public static class IterkoczeMath {
             return lInt + rFloat;
         if (left is float lFloat && right is int rInt)
             return lFloat + rInt;
-        
+
         if (left is string || right is string)
             return $"{left}{right}";
 
@@ -26,7 +26,7 @@ public static class IterkoczeMath {
             return lInt - rFloat;
         if (left is float lFloat && right is int rInt)
             return lFloat - rInt;
-        
+
         _ = new RuntimeError($"Cannot subtract value of type {left.GetType()} to {right.GetType()}");
         return false;
     }
@@ -39,7 +39,7 @@ public static class IterkoczeMath {
             return lInt * rFloat;
         if (left is float lFloat && right is int rInt)
             return lFloat * rInt;
-        
+
         _ = new RuntimeError($"Cannot multiply value of type {left.GetType()} with {right.GetType()}");
         return false;
     }

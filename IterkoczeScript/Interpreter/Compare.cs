@@ -1,4 +1,4 @@
-using IterkoczeScript;
+namespace IterkoczeScript.Interpreter;
 
 public static class Compare {
     public static bool GreaterThan(object? left, object? right) {

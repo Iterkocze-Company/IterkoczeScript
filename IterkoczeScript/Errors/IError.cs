@@ -1,4 +1,7 @@
-﻿namespace IterkoczeScript.Errors {
+﻿using IterkoczeScript.Interpreter;
+
+namespace IterkoczeScript.Errors
+{
     public interface IError {
         string Message { get; }
         public void SetError() {

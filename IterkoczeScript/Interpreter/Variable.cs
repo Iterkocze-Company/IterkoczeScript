@@ -1,12 +1,12 @@
 ﻿using System.Reflection.Metadata;
 
-namespace IterkoczeScript;
+namespace IterkoczeScript.Interpreter;
 
 public class Variable {
-    public Variable(object? val, bool global = false, bool constant = false) {
+    public Variable(object? val, bool global = false, bool constant = false)  {
         Value = val;
-        isGlobal= global;
-        isConstant= constant;
+        isGlobal = global;
+        isConstant = constant;
     }
     public bool isGlobal { get; set; }
     public bool isConstant { get; set; }

@@ -1,9 +1,7 @@
-namespace IterkoczeScript;
+namespace IterkoczeScript.Interpreter;
 
-public static class IterkoczeBoolean
-{
-    public static bool And(object? left, object? right)
-    {
+public static class IterkoczeBoolean {
+    public static bool And(object? left, object? right) {
         if (left is int l && right is int r)
             return l == r;
         if (left is float lf && right is float rf)
@@ -15,23 +13,21 @@ public static class IterkoczeBoolean
         if (left is bool lBool && right is bool rBool)
             return lBool && rBool;
 
-        new RuntimeError($"Cannot compare values of types {left.GetType()} and {right.GetType()}");
+        _ = new RuntimeError($"Cannot compare values of types {left.GetType()} and {right.GetType()}");
         return false;
     }
-    public static bool Or(object? left, object? right)
-    {
+    public static bool Or(object? left, object? right)  {
         if (left is bool lBool && right is bool rBool)
             return lBool || rBool;
 
-        new RuntimeError($"Cannot compare values of types {left.GetType()} and {right.GetType()}");
+        _ = new RuntimeError($"Cannot compare values of types {left.GetType()} and {right.GetType()}");
         return false;
     }
-    public static bool Not(object? exp)
-    {
+    public static bool Not(object? exp) {
         if (exp is bool lBool)
-            return !(lBool);
+            return !lBool;
 
-        new RuntimeError($"You can't invert non-booleans with `not`, but tried to invert type {exp.GetType()}");
+        _ = new RuntimeError($"You can't invert non-booleans with `not`, but tried to invert type {exp.GetType()}");
         return false;
     }
 }

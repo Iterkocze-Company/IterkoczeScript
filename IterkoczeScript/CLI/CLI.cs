@@ -1,5 +1,6 @@
 ﻿using Antlr4.Runtime;
 using IterkoczeScript.Content;
+using IterkoczeScript.Interpreter;
 using Newtonsoft.Json;
 
 namespace IterkoczeScript.CLI;

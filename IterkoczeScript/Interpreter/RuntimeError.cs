@@ -1,9 +1,9 @@
 using Antlr4.Runtime;
 
-namespace IterkoczeScript;
+namespace IterkoczeScript.Interpreter;
 
 public class RuntimeError {
-    public RuntimeError(string message, ParserRuleContext ctx = null) {
+    public RuntimeError(string message, ParserRuleContext? ctx = null) {
         var oldColour = Console.ForegroundColor;
         Console.ForegroundColor = ConsoleColor.Red;
         Console.Write("[RUNTIME ERROR] " + message);

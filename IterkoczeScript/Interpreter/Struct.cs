@@ -1,4 +1,4 @@
-namespace IterkoczeScript;
+namespace IterkoczeScript.Interpreter;
 
 public class Struct {
     public string Name { get; set; }

@@ -1,6 +1,6 @@
 ﻿using IterkoczeScript.Errors;
 using System.Net.NetworkInformation;
-using System.Net;
+using IterkoczeScript.Interpreter;
 
 namespace IterkoczeScript.Functions;
 

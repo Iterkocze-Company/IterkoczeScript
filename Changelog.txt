@@ -1,4 +1,9 @@
 Changelog for version 1.2.0
+	- Added a new keyword `drop` for decrementing variables,
+	- Added a new keyword `raise` for incrementing variables,
+	- Codebase cleanup,
+	- `WriteToFile` renamed to `WriteFile`,
+	- `ReadFromFile` renamed to `ReadFile` and now it raises an error on fail,
 	- Changed Struct definition syntax,
 	- Changed function definition syntax,
 	- Fixed a crash if you provided an invalid script filename to be interpreted,

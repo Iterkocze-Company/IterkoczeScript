@@ -23,12 +23,12 @@ public static class PackageManager {
         }
         Console.WriteLine("Dwonloaded database file");
         Console.WriteLine("Reading the database file...");
-        using (StreamReader r = new StreamReader("packages.json.tmp")) {
+        using (StreamReader r = new("packages.json.tmp")) {
             string json = r.ReadToEnd();
             List<PackageItemJSON> items = JsonConvert.DeserializeObject<List<PackageItemJSON>>(json);
             foreach (var item in items) {
-                if (item.Package.Name == whatPackageToDownload) {
-                    File.WriteAllText($"Lib/{whatPackageToDownload}.is", item.Package.Src);
+                if (item.Atom == whatPackageToDownload) {
+                    File.WriteAllText($"Lib/{whatPackageToDownload}.is", item.Src);
                     Console.WriteLine("Package downloaded");
                     goto cleanup;
                 }

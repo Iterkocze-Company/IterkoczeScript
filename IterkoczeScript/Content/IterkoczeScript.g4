@@ -3,7 +3,7 @@ grammar IterkoczeScript;
 program: line* EOF;
 line: statement | ifBlock | forBlock | whileBlock | foreachBlock | functionDefinition | structOperation;
 
-statement: (variableDefinition | catapult | useDirective | arrayOperation | assingment | listOperation 
+statement: (decrementVar | incrementVar | variableDefinition | catapult | useDirective | arrayOperation | assingment | listOperation 
         | structMemberDefinition | structOperation | expression
         | functionCall | returnStatement | dictionaryOperation) ';';
 
@@ -28,6 +28,10 @@ arrayOperation
     | IDENTIFIER '[' INTEGER ']' '=' expression                 #arrayAssingment
     | IDENTIFIER '[' INTEGER ']' ':' IDENTIFIER '=' expression  #arrayStructMemberAccessAssingment
     ;
+
+incrementVar: 'raise' IDENTIFIER;
+
+decrementVar: 'drop' IDENTIFIER;
 
 returnStatement: 'give' expression;
 
