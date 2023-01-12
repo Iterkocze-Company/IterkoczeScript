@@ -12,6 +12,8 @@ public class Function {
     public Dictionary<string, Struct> StructInstances { get; set; } = new();
     public Dictionary<string, Array> Arrays { get; set; } = new();
     public Dictionary<string, List<object?>> Lists { get; set; } = new();
+    public Dictionary<string, Dictionary<string, object?>> Dictionaries { get; } = new();
+    public List<string> FeatureEnabled = new();
 
     public Function(string name, IterkoczeScriptParser.BlockContext code) {
         Name = name;

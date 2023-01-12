@@ -5,15 +5,13 @@ namespace IterkoczeScript.Functions;
 
 public static class Basic {
     public static object? Write(object?[] args) {
-        if (args.Length > 2)
+        if (args.Length == 0 || args.Length > 2)
             _ = new RuntimeError("Function \"Write\" expects 1 argument. And 1 optional argument");
 
-        if (args.Length == 2)
-        {
+        if (args.Length == 2) {
             var oldColour = Console.ForegroundColor;
             ConsoleColor colour = (ConsoleColor)(args[1]);
-            switch (colour)
-            {
+            switch (colour) {
                 case ConsoleColor.Red:
                     Console.ForegroundColor = ConsoleColor.Red;
                     break;
@@ -32,8 +30,7 @@ public static class Basic {
                 Console.WriteLine(args[0]);
             Console.ForegroundColor = oldColour;
         }
-        else
-        {
+        else {
             if (args[0] != null)
                 Console.WriteLine(args[0]);
         }
@@ -58,7 +55,7 @@ public static class Basic {
             Console.Write(args[0]);
 
         try { return Convert.ToInt32(Console.ReadLine()); }
-        catch (Exception e) {
+        catch {
             IError err = new ErrorConversionFailed();
             err.SetError();
             return err;

@@ -1,3 +1,11 @@
+Changelog for version 1.2.1
+	- Added language features: MichauScript and Silent,
+	- Added a new keyword `enable` for enabling optional language features,
+	- Fixed invalid scoping of Dictionaries,
+	- Fixed a crash if you wanted to assign a key to a non-existant Dictionary,
+	- Added the `--http-server` module,
+	- Fixed a crash if you didn't provide any arguments to `Write`,
+
 Changelog for version 1.2.0
 	- Added Json support with `Json()`, `JsonRead()` and `JsonWrite()`,
 	- Added a new keyword `drop` for decrementing variables,

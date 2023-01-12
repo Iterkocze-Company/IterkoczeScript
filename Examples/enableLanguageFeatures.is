@@ -1,0 +1,7 @@
+enable MichauScript;
+
+//This if will be right 50% of the time
+
+perhaps {
+	Write("Hello");
+} if (1 == 1);

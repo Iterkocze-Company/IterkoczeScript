@@ -7,7 +7,8 @@ namespace IterkoczeScript.Interpreter;
 
 public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
     private bool ShouldEndLoop = false;
-    public static Dictionary<string, Dictionary<string, object?>> DICTIONARIES { get; } = new();
+    public static bool IsSilent = false; // Determines if the Interpreter will show warnings
+
     public static Dictionary<string, Variable> PREDEF_VARS { get; } = new();
     public static Dictionary<string, Variable> GLOBAL_VARS { get; } = new();
     private Dictionary<string, object?> STANDARD_FUNCTIONS { get; } = new();
@@ -166,9 +167,9 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
             }
         }
         //If it's a Dictionary
-        foreach (var VARIABLE in DICTIONARIES) {
+        foreach (var VARIABLE in currentFunction.Dictionaries) {
             if (VARIABLE.Key == arrayName) {
-                if (DICTIONARIES[arrayName].TryGetValue("\"" + index.ToString() + "\"", out object? val)) {
+                if (currentFunction.Dictionaries[arrayName].TryGetValue("\"" + index.ToString() + "\"", out object? val)) {
                     return val;
                 }
                 _ = new RuntimeError($"Element {index} wasn't found in Dictionary {arrayName}", context);
@@ -397,6 +398,11 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
                 : IsFalse
             ;
 
+        Random rand = new();
+        if (currentFunction.FeatureEnabled.Contains("MichauScript") && rand.NextDouble() <= 0.5) {
+            return null;
+        }
+
         if (condition(Visit(context.expression()))) {
             Visit(context.block());
         }
@@ -421,10 +427,11 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
                 OLDVARS = currentFunction.VARS;
                 function.Args = args;
                 currentFunction.Args = args;
+                var oldFeatures = currentFunction.FeatureEnabled;
                 currentFunction = function;
                 VisitBlock(function.Code);
-                //currentFunction.VARS = VARS;
                 currentFunction.VARS = OLDVARS;
+                currentFunction.FeatureEnabled = oldFeatures;
 
                 return function.ReturnValue;
             }
@@ -446,8 +453,9 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
 
     public override object? VisitReturnStatement(IterkoczeScriptParser.ReturnStatementContext context) {
         //TODO: It's good for now...?
-        if (currentFunction.ReturnValue == null)
+        if (currentFunction.ReturnValue == null) {
             currentFunction.ReturnValue = Visit(context.expression());
+        }
         return null;
     }
 
@@ -502,7 +510,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
 
         if (!currentFunction.VARS.ContainsKey(varName)
             && !GLOBAL_VARS.ContainsKey(varName)
-            && !DICTIONARIES.ContainsKey(varName)) {
+            && !currentFunction.Dictionaries.ContainsKey(varName)) {
             _ = new RuntimeError($"Variable {varName} is not defined!", context);
         }
 
@@ -512,8 +520,8 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         if (currentFunction.VARS.ContainsKey(varName))
             return currentFunction.VARS[varName].Value;
 
-        if (DICTIONARIES[varName] is Dictionary<string, object?>) {
-            return DICTIONARIES[varName];
+        if (currentFunction.Dictionaries[varName] is Dictionary<string, object?>) {
+            return currentFunction.Dictionaries[varName];
         }
 
         return null;
@@ -628,7 +636,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         var Dic = new Dictionary<string, object>();
         //Dic[dictionaryName] = new Dictionary<string, object>();
 
-        DICTIONARIES.Add(dictionaryName, Dic);
+        currentFunction.Dictionaries.Add(dictionaryName, Dic);
         return 0;
     }
 
@@ -637,7 +645,10 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         var fieldName = context.STRING().GetText();
         var val = Visit(context.expression());
 
-        DICTIONARIES[dicName][fieldName] = val;
+        if (!currentFunction.Dictionaries.ContainsKey(dicName))
+            _ = new RuntimeError($"Dictionary {dicName} wasn't defined");
+
+        currentFunction.Dictionaries[dicName][fieldName] = val;
 
         return 0;
     }
@@ -691,6 +702,23 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         currentFunction.VARS[varName].Value = res;
 
         return 0;
+    }
+
+    public override object VisitEnableLanguageFeature([NotNull] IterkoczeScriptParser.EnableLanguageFeatureContext context) {
+        var feature = context.IDENTIFIER().GetText();
+        switch (feature) {
+            case "MichauScript":
+                currentFunction.FeatureEnabled.Add("MichauScript");
+                break;
+            case "Silent":
+                IsSilent = true;
+                break;
+            default:
+                _ = new RuntimeWarning($"Feature {feature} wasn't found", context);
+                break;
+        }
+        
+        return null;
     }
 
     private bool IsTrue(object? value) {

@@ -1,0 +1,6 @@
+meth Tet -> {
+	give 2;
+	Write("ff");
+}
+
+Write(Tet());

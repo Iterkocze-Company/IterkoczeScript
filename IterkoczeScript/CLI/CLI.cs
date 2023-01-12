@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime;
 using IterkoczeScript.Content;
 using IterkoczeScript.Interpreter;
+using IterkoczeScript.Modules;
 using Newtonsoft.Json;
 
 namespace IterkoczeScript.CLI;
@@ -8,7 +9,7 @@ namespace IterkoczeScript.CLI;
 public static class CLI
 {
     public static string[]? ProgramArgs;
-    private const string versionInfo = "Iterkocze IterkoczeScriptInterpreter 1.2.0";
+    private const string versionInfo = "Iterkocze IterkoczeScriptInterpreter 1.2.1";
     public static void Main(string[] args) {
         if (args.Length == 0) {
             Console.WriteLine(versionInfo);
@@ -16,6 +17,24 @@ public static class CLI
             Console.WriteLine("-d name or --download name -> Download a package");
             Environment.Exit(0);
         }
+
+        if (args.Contains("--http-server")) {
+            if (args.Length != 2) {
+                Console.WriteLine("Provide the directory to host");
+                Environment.Exit(-1);
+            }
+                
+            string[] prefixes = { "http://localhost:8080/" };
+            string rootDirectory = args[1];
+            HttpServer server = new(prefixes, rootDirectory);
+            server.Run();
+            while (true) {
+                Console.ReadLine();
+                break;
+            }
+        }
+
+
         if (args.Contains("-v") || args.Contains("--version")) {
             Console.WriteLine(versionInfo);
             Environment.Exit(0);
@@ -23,6 +42,7 @@ public static class CLI
         if (args.Contains("-d") || args.Contains("--download")) {
             PackageManager.Download(args);
         }
+
         ProgramArgs = new string[args.Length - 1];
         Array.Copy(args, 1, ProgramArgs, 0, ProgramArgs.Length);
         string fileName = args[0];

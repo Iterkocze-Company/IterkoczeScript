@@ -1,0 +1,4 @@
+Finally fix the give not stopping bug
+
+
+Don't forget to set the version in the CLI!

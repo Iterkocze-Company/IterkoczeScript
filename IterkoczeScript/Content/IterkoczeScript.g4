@@ -3,7 +3,7 @@ grammar IterkoczeScript;
 program: line* EOF;
 line: statement | ifBlock | forBlock | whileBlock | foreachBlock | functionDefinition | structOperation;
 
-statement: (decrementVar | incrementVar | variableDefinition | catapult | useDirective | arrayOperation | assingment | listOperation 
+statement: (enableLanguageFeature | decrementVar | incrementVar | variableDefinition | catapult | useDirective | arrayOperation | assingment | listOperation 
         | structMemberDefinition | structOperation | expression
         | functionCall | returnStatement | dictionaryOperation) ';';
 
@@ -64,6 +64,8 @@ useDirective: ('@use' || '#use') IDENTIFIER;
 catapult: 'catapult' IDENTIFIER;
 
 variableDefinition: 'remember' GLOBAL? CONST? IDENTIFIER '=' expression;
+
+enableLanguageFeature: 'enable' IDENTIFIER ;
 
 expression
     : constant                                              #constantExp
