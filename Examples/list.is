@@ -10,3 +10,15 @@ L1.Add("Hello");
 each (val in L1) {
     Write(val);
 }
+
+new List L2;
+
+L2.Add("String2");
+L2.Add("String1");
+L2.Add("String21");
+
+L2.Sort();
+
+each (el in L2) {
+    Write(el);
+}

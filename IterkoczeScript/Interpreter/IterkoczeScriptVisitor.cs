@@ -438,12 +438,13 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         }
 
         if (subjectName != null) {
-            if (currentFunction.Lists.ContainsKey(subjectName)) // If it's a List
-                return ListOperations.Invoke(currentFunction.Lists[subjectName], args[0], context.start.Text);
+            // If it's a List
+            if (currentFunction.Lists.ContainsKey(subjectName))
+                return ListOperations.Invoke(currentFunction.Lists[subjectName], args, context.start.Text, subjectName, context);
         }
 
         if (!STANDARD_FUNCTIONS.ContainsKey(name))
-            new RuntimeError($"Function {name} is not defined!", context);
+            _ = new RuntimeError($"Function {name} is not defined!", context);
 
         if (STANDARD_FUNCTIONS[name] is not Func<object?[], object?> func)
             throw new Exception($"variable {name} is not a function.");

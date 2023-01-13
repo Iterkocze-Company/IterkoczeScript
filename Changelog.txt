@@ -1,3 +1,8 @@
+Changelog for version 1.2.2
+	- Added `List.Clear()`,
+	- Added `List.Sort()`,
+	- Added `List.Contains(element)`,
+
 Changelog for version 1.2.1
 	- Added language features: MichauScript and Silent,
 	- Added a new keyword `enable` for enabling optional language features,
