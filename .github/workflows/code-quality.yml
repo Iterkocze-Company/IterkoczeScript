@@ -12,5 +12,6 @@ jobs:
       with:
         dotnet-version: 5.0.100
     - name: Run StyleCop
-      run: dotnet tool install --global dotnet-stylecop
-      run: dotnet stylecop
+      script:
+        - dotnet tool install --global dotnet-stylecop
+        - dotnet stylecop
