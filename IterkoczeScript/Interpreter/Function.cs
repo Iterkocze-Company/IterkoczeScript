@@ -13,7 +13,13 @@ public class Function {
     public Dictionary<string, Array> Arrays { get; set; } = new();
     public Dictionary<string, List<object?>> Lists { get; set; } = new();
     public Dictionary<string, Dictionary<string, object?>> Dictionaries { get; } = new();
-    public List<string> FeatureEnabled = new();
+    public List<Features> FeatureEnabled = new();
+
+
+    public enum Features {
+        MichauScript,
+        Silent
+    }
 
     public Function(string name, IterkoczeScriptParser.BlockContext code) {
         Name = name;

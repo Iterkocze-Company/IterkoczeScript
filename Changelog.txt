@@ -1,3 +1,10 @@
+Changelog for 1.2.3
+	- Now Runtime Error writes a newline,
+	- Added a function for downloading files `Download(URL, pathToFile)`,
+	- Fixed weird behavior and errors in Json functions,
+	- Added `Dictionary.ContainsKey(key)`,
+	- Fixed a crash if you downloaded a package while not invoking the binary in the same directory as Lib,
+
 Changelog for version 1.2.2
 	- Added `List.Clear()`,
 	- Added `List.Sort()`,

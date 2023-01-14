@@ -9,7 +9,7 @@ namespace IterkoczeScript.CLI;
 public static class CLI
 {
     public static string[]? ProgramArgs;
-    private const string versionInfo = "Iterkocze IterkoczeScriptInterpreter 1.2.2";
+    private const string versionInfo = "Iterkocze IterkoczeScript Interpreter 1.2.3";
     public static void Main(string[] args) {
         if (args.Length == 0) {
             Console.WriteLine(versionInfo);

@@ -57,6 +57,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
 
         // NETWORK
         STANDARD_FUNCTIONS["IsServerUp"] = new Func<object?[], object?>(Network.IsServerUp);
+        STANDARD_FUNCTIONS["Download"] = new Func<object?[], object?>(Network.Download);
 
         // "SECURITY" LULW
         STANDARD_FUNCTIONS["SHA1"] = new Func<object?[], object?>(Security.SHA1);
@@ -169,7 +170,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         //If it's a Dictionary
         foreach (var VARIABLE in currentFunction.Dictionaries) {
             if (VARIABLE.Key == arrayName) {
-                if (currentFunction.Dictionaries[arrayName].TryGetValue("\"" + index.ToString() + "\"", out object? val)) {
+                if (currentFunction.Dictionaries[arrayName].TryGetValue(index.ToString(), out object? val)) {
                     return val;
                 }
                 _ = new RuntimeError($"Element {index} wasn't found in Dictionary {arrayName}", context);
@@ -399,7 +400,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
             ;
 
         Random rand = new();
-        if (currentFunction.FeatureEnabled.Contains("MichauScript") && rand.NextDouble() <= 0.5) {
+        if (currentFunction.FeatureEnabled.Contains(Function.Features.MichauScript) && rand.NextDouble() <= 0.5) {
             return null;
         }
 
@@ -441,6 +442,10 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
             // If it's a List
             if (currentFunction.Lists.ContainsKey(subjectName))
                 return ListOperations.Invoke(currentFunction.Lists[subjectName], args, context.start.Text, subjectName, context);
+
+            if (currentFunction.Dictionaries.ContainsKey(subjectName))
+                return DictionaryOperation.Invoke(currentFunction.Dictionaries[subjectName], args, context.start.Text, subjectName, context);
+
         }
 
         if (!STANDARD_FUNCTIONS.ContainsKey(name))
@@ -649,7 +654,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         if (!currentFunction.Dictionaries.ContainsKey(dicName))
             _ = new RuntimeError($"Dictionary {dicName} wasn't defined");
 
-        currentFunction.Dictionaries[dicName][fieldName] = val;
+        currentFunction.Dictionaries[dicName][fieldName.Substring(1, fieldName.Length-2)] = val;
 
         return 0;
     }
@@ -709,7 +714,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         var feature = context.IDENTIFIER().GetText();
         switch (feature) {
             case "MichauScript":
-                currentFunction.FeatureEnabled.Add("MichauScript");
+                currentFunction.FeatureEnabled.Add(Function.Features.MichauScript);
                 break;
             case "Silent":
                 IsSilent = true;

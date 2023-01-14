@@ -9,9 +9,8 @@ public static class Json {
     public static object? Json1(object?[] args) {
         if (args.Length != 1)
             _ = new RuntimeError("Function \"Json\" expects 1 argument. Path to the .json file");
-        if (!File.Exists(args[0].ToString())) {
-            _ = new RuntimeError($"Can't open the json file {args[0]}");
-        }
+        if (!File.Exists(args[0].ToString()))
+            File.Create(args[0].ToString());
         try {
             return JObject.Parse(File.ReadAllText(args[0].ToString()));
         }

@@ -1,6 +1,7 @@
 ﻿using IterkoczeScript.Errors;
 using System.Net.NetworkInformation;
 using IterkoczeScript.Interpreter;
+using System.Net;
 
 namespace IterkoczeScript.Functions;
 
@@ -35,6 +36,29 @@ public static class Network {
             err.SetError();
             return err;
         }
-        return 0;
+        return null;
+    }
+    public static object? Download(object?[] args) {
+        if (args.Length != 2)
+            _ = new RuntimeError("Function \"Download\" expects at 2 arguments. URL and destination");
+
+        string url = args[0].ToString();
+        string savePath = args[1].ToString();
+        if (!Uri.IsWellFormedUriString(url, UriKind.RelativeOrAbsolute)) {
+            IError err = new ErrorMalformattedURL();
+            err.SetError();
+            return err;
+        }
+        if (!Uri.IsWellFormedUriString(savePath, UriKind.RelativeOrAbsolute)) {
+            _ = new RuntimeError($"Path: {savePath} isn't valid");
+        }
+
+        try {
+            using WebClient client = new();
+            client.DownloadFile(url, savePath);
+        } catch (Exception e) {
+            _ = new RuntimeError("Error while downloading file: " + e.Message);
+        }
+        return null;
     }
 }

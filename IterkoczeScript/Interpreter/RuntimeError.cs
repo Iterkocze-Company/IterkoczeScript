@@ -7,7 +7,7 @@ public class RuntimeError {
         var oldColour = Console.ForegroundColor;
         Console.ForegroundColor = ConsoleColor.Red;
         Console.Write("[RUNTIME ERROR] " + message);
-        if (ctx != null) Console.Write(" At line " + ctx.start.Line + "\n" + ctx.start);
+        if (ctx != null) Console.Write(" At line " + ctx.start.Line + "\n" + ctx.start + "\n");
         Console.ForegroundColor = oldColour;
         Environment.Exit(-1);
     }

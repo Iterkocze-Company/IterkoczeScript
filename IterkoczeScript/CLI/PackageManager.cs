@@ -28,7 +28,7 @@ public static class PackageManager {
             List<PackageItemJSON> items = JsonConvert.DeserializeObject<List<PackageItemJSON>>(json);
             foreach (var item in items) {
                 if (item.Atom == whatPackageToDownload) {
-                    File.WriteAllText($"Lib/{whatPackageToDownload}.is", item.Src);
+                    File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + $"/Lib/{whatPackageToDownload}.is", item.Src);
                     Console.WriteLine("Package downloaded");
                     goto cleanup;
                 }
