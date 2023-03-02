@@ -1,0 +1,13 @@
+option = Read("add or sub?: ");
+number1 = ConvertToInt(Read("Number: "));
+number2 = ConvertToInt(Read("Number: "));
+
+perhaps {
+	Write(number1 + number2);
+} if (option == "add");
+perhaps {
+	Write(number1 - number2);
+} if (option == "sub");
+otherwise {
+	Write("Wrong operation!");
+}

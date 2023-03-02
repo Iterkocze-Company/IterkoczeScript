@@ -3,7 +3,8 @@ grammar IterkoczeScript;
 program: line* EOF;
 line: statement | ifBlock | forBlock | whileBlock | foreachBlock | functionDefinition | structOperation;
 
-statement: (enableLanguageFeature | decrementVar | incrementVar | variableDefinition | catapult | useDirective | arrayOperation | assingment | listOperation 
+statement: (forgetVariable | enableLanguageFeature | decrementVar | incrementVar | variableDefinition | catapult
+        | useDirective | arrayOperation | assingment | listOperation 
         | structMemberDefinition | structOperation | expression
         | functionCall | returnStatement | dictionaryOperation) ';';
 
@@ -67,6 +68,8 @@ variableDefinition: 'remember' GLOBAL? CONST? IDENTIFIER '=' expression;
 
 enableLanguageFeature: 'enable' IDENTIFIER ;
 
+forgetVariable: 'forget' IDENTIFIER ;
+
 expression
     : constant                                              #constantExp
     | '$' INTEGER                                           #argumentIdentifierExp
@@ -97,7 +100,6 @@ booleanOp: BOOLEAN_OPERATOR;
 BOOLEAN_OPERATOR: 'and' | 'or';
 INVERT_OPERATOR: 'not' | '!';
     
-//VAR_MOD: ('global' & 'const') ;
 GLOBAL: 'global';
 CONST: 'const';
 

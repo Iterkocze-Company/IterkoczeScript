@@ -9,12 +9,13 @@ namespace IterkoczeScript.CLI;
 public static class CLI
 {
     public static string[]? ProgramArgs;
-    private const string versionInfo = "Iterkocze IterkoczeScript Interpreter 1.2.3";
+    private const string versionInfo = "Iterkocze IterkoczeScript Interpreter 1.2.4";
     public static void Main(string[] args) {
         if (args.Length == 0) {
             Console.WriteLine(versionInfo);
             Console.WriteLine("-v or --version -> Show version");
             Console.WriteLine("-d name or --download name -> Download a package");
+            Console.WriteLine("Visit https://iterkoczescriptpackages.xlx.pl for package list");
             Environment.Exit(0);
         }
 
@@ -68,7 +69,7 @@ public static class CLI
                 }
             }
         }
-        catch (Exception ex) {
+        catch {
             _ = new RuntimeError($"Can't import {currentlyImportedFileName}. It probably doesn't exist");
         }
 
@@ -78,12 +79,12 @@ public static class CLI
         IterkoczeScriptLexer IterkoczeLexer = new(inputStream);
         CommonTokenStream commonTokenStream = new(IterkoczeLexer);
 
-        IterkoczeScriptParser IterkoczeParser = new IterkoczeScriptParser(commonTokenStream);
+        IterkoczeScriptParser IterkoczeParser = new(commonTokenStream);
         IterkoczeParser.AddErrorListener(new ErrorStrategy());
 
         //IterkoczeScriptParser IterkoczeParser = new(commonTokenStream);
         IterkoczeScriptParser.ProgramContext programContent = IterkoczeParser.program();
-        IterkoczeScriptVisitor IterkoczeVisitor = new IterkoczeScriptVisitor();
+        IterkoczeScriptVisitor IterkoczeVisitor = new();
         IterkoczeVisitor.Visit(programContent);
     }
 }

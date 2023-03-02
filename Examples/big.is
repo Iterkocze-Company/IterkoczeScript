@@ -26,7 +26,7 @@ StopRuntimeTimer();
 msg = "This took " + GetRuntime() + " milliseconds";
 
 Write(msg);
-WriteFile("time.txt", msg);
+FileWrite("time.txt", msg);
 
 each (ch in msg) {
 	perhaps {

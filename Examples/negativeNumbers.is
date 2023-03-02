@@ -1,0 +1,2 @@
+variable = Negative(112);
+Write(variable);

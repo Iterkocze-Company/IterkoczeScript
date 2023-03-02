@@ -14,7 +14,7 @@ class ErrorStrategy : BaseErrorListener {
     {
         var oldColour = Console.ForegroundColor;
         Console.ForegroundColor = ConsoleColor.Red;
-        Console.Write("[SYNTAX ERROR] " + msg + " line " + line);
+        Console.Write("[SYNTAX ERROR] " + msg + " line " + line + " character " + charPositionInLine);
         Console.ForegroundColor = oldColour;
 
         Environment.Exit(-1);

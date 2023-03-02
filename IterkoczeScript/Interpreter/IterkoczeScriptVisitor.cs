@@ -2,10 +2,14 @@ using Antlr4.Runtime.Misc;
 using IterkoczeScript.Content;
 using IterkoczeScript.Errors;
 using IterkoczeScript.Functions;
+using System.Globalization;
+using System.Linq;
+using static IterkoczeScript.Interpreter.Variable;
 
 namespace IterkoczeScript.Interpreter;
 
 public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
+
     private bool ShouldEndLoop = false;
     public static bool IsSilent = false; // Determines if the Interpreter will show warnings
 
@@ -13,7 +17,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
     public static Dictionary<string, Variable> GLOBAL_VARS { get; } = new();
     private Dictionary<string, object?> STANDARD_FUNCTIONS { get; } = new();
     private List<Function> FUNCTIONS { get; } = new();
-    private Function currentFunction = new("Main", null);
+    public static Function currentFunction = new("Main", null);
 
     public IterkoczeScriptVisitor() {
         PREDEF_VARS["PI"] = new(Math.PI, true, true);
@@ -35,24 +39,34 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         STANDARD_FUNCTIONS["Linux"] = new Func<object?[], object?>(Functions.Utility.Linux);
 
         // IO
-        STANDARD_FUNCTIONS["WriteFile"] = new Func<object?[], object?>(IO.WriteFile);
-        STANDARD_FUNCTIONS["ReadFile"] = new Func<object?[], object?>(IO.ReadFile);
+        STANDARD_FUNCTIONS["WriteFile"] = new Func<object?[], object?>(IO.FileWrite);
+        STANDARD_FUNCTIONS["ReadFile"] = new Func<object?[], object?>(IO.FileRead);
         STANDARD_FUNCTIONS["FileExists"] = new Func<object?[], object?>(IO.FileExists);
-
+        STANDARD_FUNCTIONS["DirectoryCreate"] = new Func<object?[], object?>(IO.DirectoryCreate);
+        STANDARD_FUNCTIONS["AllFilesIn"] = new Func<object?[], object?>(IO.AllFilesIn);
+        STANDARD_FUNCTIONS["FileMove"] = new Func<object?[], object?>(IO.FileMove);
+        STANDARD_FUNCTIONS["FileGetName"] = new Func<object?[], object?>(IO.FileGetName);
+        STANDARD_FUNCTIONS["FileGetExtention"] = new Func<object?[], object?>(IO.FileGetExtention);
+        STANDARD_FUNCTIONS["GetConfigDirectory"] = new Func<object?[], object?>(IO.GetConfigDirectory);
 
         // BASIC
         STANDARD_FUNCTIONS["Write"] = new Func<object?[], object?>(Basic.Write);
         STANDARD_FUNCTIONS["Read"] = new Func<object?[], object?>(Basic.Read);
         STANDARD_FUNCTIONS["ReadAsInt"] = new Func<object?[], object?>(Basic.ReadAsInt);
+        STANDARD_FUNCTIONS["Negative"] = new Func<object?[], object?>(Basic.Negative);
 
         // STRINGS
         STANDARD_FUNCTIONS["GetChar"] = new Func<object?[], object?>(Strings.GetChar);
         STANDARD_FUNCTIONS["ToLower"] = new Func<object?[], object?>(Strings.ToLower);
         STANDARD_FUNCTIONS["ToUpper"] = new Func<object?[], object?>(Strings.ToUpper);
+        STANDARD_FUNCTIONS["StringRemove"] = new Func<object?[], object?>(Strings.StringRemove);
+        STANDARD_FUNCTIONS["StringRemoveFirst"] = new Func<object?[], object?>(Strings.StringRemoveFirst);
+        STANDARD_FUNCTIONS["StringEndsWith"] = new Func<object?[], object?>(Strings.StringEndsWith);
 
 
         // CONVERTION
         STANDARD_FUNCTIONS["ConvertToInt"] = new Func<object?[], object?>(Conversion.ConvertToInt);
+        STANDARD_FUNCTIONS["ConvertToDouble"] = new Func<object?[], object?>(Conversion.ConvertToDouble);
         STANDARD_FUNCTIONS["ConvertToString"] = new Func<object?[], object?>(Conversion.ConvertToString);
 
         // NETWORK
@@ -67,6 +81,10 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         STANDARD_FUNCTIONS["Json"] = new Func<object?[], object?>(Json.Json1);
         STANDARD_FUNCTIONS["JsonRead"] = new Func<object?[], object?>(Json.JsonRead);
         STANDARD_FUNCTIONS["JsonWrite"] = new Func<object?[], object?>(Json.JsonWrite);
+        STANDARD_FUNCTIONS["JsonArrayToArray"] = new Func<object?[], object?>(Json.JsonArrayToArray);
+
+        // DEBUG
+        STANDARD_FUNCTIONS["DebugDump"] = new Func<object?[], object?>(Debug.DebugDump);
     }
 
     public override object? VisitListCreation(IterkoczeScriptParser.ListCreationContext context) {
@@ -85,7 +103,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
             GLOBAL_VARS[varName].Value = value;
 
         if (!currentFunction.VARS.ContainsKey(varName))
-            currentFunction.VARS.Add(varName, new(value, isGlobal, isConst));
+            currentFunction.VARS.Add(varName, new(value, isGlobal, isConst, context.start.Line));
         else
             _ = new RuntimeError($"Variable {varName} already exists", context);
 
@@ -107,7 +125,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
             return currentFunction.VARS[varName].Value;
         }
         if (!currentFunction.VARS.ContainsKey(varName))
-            currentFunction.VARS.Add(varName, new(value, false, false));
+            currentFunction.VARS.Add(varName, new(value, false, false, context.start.Line));
 
         currentFunction.VARS[varName].Value = value;
 
@@ -285,7 +303,13 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         var vars = VisitBlock(context.block());
         var structName = context.IDENTIFIER().GetText();
 
+        foreach (var s in currentFunction.Structs) {
+            if (s.Name == structName)
+                _ = new RuntimeError($"Struct with name {structName} already exists, but tried to redefine", context);
+        }
+
         currentFunction.Structs.Add(new Struct(structName, (Dictionary<string, object?>)vars));
+
 
         return null;
     }
@@ -323,6 +347,12 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         var structInstanceName = context.IDENTIFIER(0).GetText();
         var varName = context.IDENTIFIER(1).GetText();
         var value = Visit(context.expression());
+
+        if (!currentFunction.StructInstances.ContainsKey(structInstanceName))
+            _ = new RuntimeError($"Struct {structInstanceName} doesn't exist in context {currentFunction.Name}");
+
+        if (!currentFunction.StructInstances[structInstanceName].Variables.ContainsKey(varName))
+            _ = new RuntimeError($"Struct {structInstanceName} doesn't contain a member named {varName}");
 
         currentFunction.StructInstances[structInstanceName].Variables[varName] = value;
 
@@ -383,12 +413,24 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
 
         //currentFunction.VARS[variable] = null;
 
-        foreach (var v in target.ToString()) {
-            //currentFunction.VARS[variable].Value = v;
-            currentFunction.VARS[variable] = new(v);
-            Visit(context.block());
+        if (target is Array) {
+            foreach (var v in (Array)target) {
+                //currentFunction.VARS[variable].Value = v;
+                currentFunction.VARS[variable] = new(v);
+                Visit(context.block());
+            }
+            goto finish;
         }
 
+        if (target is string) {
+            foreach (var v in target.ToString()) {
+                currentFunction.VARS[variable] = new(v);
+                Visit(context.block());
+            }
+            goto finish;
+        }
+
+    finish:
         currentFunction.VARS.Remove(variable);
         return null;
     }
@@ -637,10 +679,8 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
     }
 
     public override object VisitDictionaryCreation([NotNull] IterkoczeScriptParser.DictionaryCreationContext context) {
-        //TODO SOMETHING HERE
         var dictionaryName = context.IDENTIFIER().GetText();
         var Dic = new Dictionary<string, object>();
-        //Dic[dictionaryName] = new Dictionary<string, object>();
 
         currentFunction.Dictionaries.Add(dictionaryName, Dic);
         return 0;
@@ -727,6 +767,18 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         return null;
     }
 
+    public override object VisitForgetVariable([NotNull] IterkoczeScriptParser.ForgetVariableContext context) {
+        var variableName = context.IDENTIFIER().GetText();
+        
+        if (currentFunction.VARS.ContainsKey(variableName)) {
+            currentFunction.VARS.Remove(variableName);
+        }
+
+        _ = new RuntimeError($"Can't forget variable {variableName}. It doesn't exist in the currect scope {currentFunction.Name}", context);
+
+        return null;
+    }
+
     private bool IsTrue(object? value) {
         if (value is IError)
             _ = new RuntimeError($"Tried to compare an error value. Possibly an unhandled error in an if block? {value}");
@@ -738,4 +790,5 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
     }
 
     private bool IsFalse(object? value) => !IsTrue(value);
+
 }

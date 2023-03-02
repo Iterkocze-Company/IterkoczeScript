@@ -61,5 +61,17 @@ public static class Basic {
             return err;
         }
     }
+    public static object? Negative(object?[] args) {
+        if (args.Length > 1)
+            _ = new RuntimeError($"Function \"Negative\" takes 1 argument. A number");
+
+        try {
+            return (int)args[0] - (int)args[0] * 2;
+        }
+        catch {
+            _ = new RuntimeError($"Value '{args[0].ToString()}' is not valid for Negative()");
+        }
+        return null;
+    }
 }
 

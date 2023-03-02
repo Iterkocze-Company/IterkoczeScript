@@ -27,7 +27,7 @@ public static class Json {
         try {
             json = (JObject)args[0];
         }
-        catch (Exception e) {
+        catch {
             _ = new RuntimeError($"{args[0]} is not a falid Json data variable");
         }
 
@@ -57,36 +57,34 @@ public static class Json {
                 writer.WritePropertyName(element.Key.Replace("\"", ""));
                 writer.WriteValue(element.Value);
             }
-            //writer.WriteEnd();
             writer.WriteEndObject();
         }
 
         try {
             File.WriteAllText(args[0].ToString(), sw.ToString());
         }
-        catch (Exception e) {
+        catch {
             _ = new RuntimeError($"Can't write to {args[0]}");
         }
 
 
-        return null;
-
-        using (JsonWriter writer = new JsonTextWriter(sw)) {
-            writer.Formatting = Formatting.Indented;
-
-            writer.WriteStartObject();
-            writer.WritePropertyName(args[1].ToString());
-            writer.WriteValue(args[2].ToString());
-            //writer.WriteEnd();
-            writer.WriteEndObject();
-        }
-        try {
-            File.WriteAllText(args[0].ToString(), sw.ToString());
-        }
-        catch (Exception e) {
-            _ = new RuntimeError($"Can't write to {args[0]}");
-        }
         return null;
     }
+    public static object? JsonArrayToArray(object?[] args) {
+        if (args.Length != 1)
+            _ = new RuntimeError("Function \"JsonArrayToArray\" expects 1 argument. The Json array");
+
+        
+        var v = ((JArray)args[0]).ToArray();
+        var ret = new string[v.Length];
+        int i = 0;
+        foreach (var vv in v) {
+            ret[i] = vv.Value<string>();
+            i++;
+        }
+
+        return ret;
+    }
+
 }
 
