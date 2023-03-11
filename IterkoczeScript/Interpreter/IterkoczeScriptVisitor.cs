@@ -37,6 +37,8 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         STANDARD_FUNCTIONS["ClearRuntimeTimer"] = new Func<object?[], object?>(Functions.Utility.ClearRuntimeTimer);
         STANDARD_FUNCTIONS["Execute"] = new Func<object?[], object?>(Functions.Utility.Execute);
         STANDARD_FUNCTIONS["Linux"] = new Func<object?[], object?>(Functions.Utility.Linux);
+        STANDARD_FUNCTIONS["Sleep"] = new Func<object?[], object?>(Functions.Utility.Sleep);
+
 
         // IO
         STANDARD_FUNCTIONS["WriteFile"] = new Func<object?[], object?>(IO.FileWrite);
@@ -72,6 +74,7 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
         // NETWORK
         STANDARD_FUNCTIONS["IsServerUp"] = new Func<object?[], object?>(Network.IsServerUp);
         STANDARD_FUNCTIONS["Download"] = new Func<object?[], object?>(Network.Download);
+        STANDARD_FUNCTIONS["Fetch"] = new Func<object?[], object?>(Network.Fetch);
 
         // "SECURITY" LULW
         STANDARD_FUNCTIONS["SHA1"] = new Func<object?[], object?>(Security.SHA1);
@@ -647,7 +650,6 @@ public class IterkoczeScriptVisitor : IterkoczeScriptBaseVisitor<object?> {
             "!=" => Compare.IsNotEqual(left, right),
             ">" => Compare.GreaterThan(left, right),
             "<" => Compare.LessThan(left, right),
-            //">=" => IsEqual(left, right),
             "<=" => Compare.LessOrEqual(left, right),
             _ => throw new NotImplementedException()
         };

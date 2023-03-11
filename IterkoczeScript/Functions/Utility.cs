@@ -1,4 +1,5 @@
-﻿using IterkoczeScript.Errors;
+﻿using Antlr4.Runtime.Misc;
+using IterkoczeScript.Errors;
 using IterkoczeScript.Interpreter;
 using System.Diagnostics;
 
@@ -74,5 +75,16 @@ public static class Utility {
     }
     public static object? Linux(object?[] args) {
         return OperatingSystem.IsLinux();
+    }
+    public static object? Sleep(object?[] args) {
+        if (args.Length != 1)
+            _ = new RuntimeError("Function \"Sleep\" expects 1 argument.");
+
+        if (!int.TryParse(args[0].ToString(), out int time)) {
+            _ = new RuntimeError($"{args[0]} in not a number. Sleep(timeMs)");
+        }
+
+        Thread.Sleep(time);
+        return null;
     }
 }

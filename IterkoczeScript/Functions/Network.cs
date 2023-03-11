@@ -2,6 +2,8 @@
 using System.Net.NetworkInformation;
 using IterkoczeScript.Interpreter;
 using System.Net;
+using Newtonsoft.Json.Linq;
+using System;
 
 namespace IterkoczeScript.Functions;
 
@@ -60,5 +62,24 @@ public static class Network {
             _ = new RuntimeError("Error while downloading file: " + e.Message);
         }
         return null;
+    }
+    public async static Task<object?> Fetch(object?[] args) {
+        if (args.Length != 1)
+            _ = new RuntimeError("Function \"Fetch\" expects at 1 argument. URL");
+
+        string url = args[0].ToString();
+
+        if (!Uri.IsWellFormedUriString(url, UriKind.RelativeOrAbsolute)) {
+            IError err = new ErrorMalformattedURL();
+            err.SetError();
+            return err;
+        }
+
+        using (HttpClient client = new HttpClient()) {
+            HttpResponseMessage response = await client.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+            string responseBody = await response.Content.ReadAsStringAsync();
+            return JObject.Parse(responseBody);
+        }
     }
 }

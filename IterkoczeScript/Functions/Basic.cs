@@ -22,17 +22,32 @@ public static class Basic {
                     Console.ForegroundColor = ConsoleColor.Blue;
                     break;
                 default:
-                    new RuntimeError("The colour wasn't defined!");
+                    _ = new RuntimeError("The colour wasn't defined!");
                     break;
 
             }
-            if (args[0] != null)
-                Console.WriteLine(args[0]);
+            if (args[0] != null) {
+                try {
+                    var x = args[0] as Task<object?>;
+                    Console.WriteLine(x.Result);
+
+                }
+                catch {
+                    Console.WriteLine(args[0]);
+                }
+            }
             Console.ForegroundColor = oldColour;
         }
         else {
-            if (args[0] != null)
-                Console.WriteLine(args[0]);
+            if (args[0] != null) {
+                try {
+                    var x = args[0] as Task<object?>;
+                    Console.WriteLine(x.Result);
+
+                } catch {
+                    Console.WriteLine(args[0]);
+                }
+            }
         }
         return null;
     }

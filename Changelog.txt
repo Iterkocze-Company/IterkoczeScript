@@ -1,4 +1,6 @@
 Changelog for 1.2.4
+	- Added 'Fetch(url)',
+	- Added 'Sleep(timeMs)',
 	- Added `ConvertToDouble()`,
 	- Fixed a bug that allowed for assingment of variables in structs that weren't defined as members,
 	- Fixed a crash if you wanted to assign a value to a nonexistant struct,
